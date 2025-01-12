@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
+    "dev": "cross-env NODE_ENV=development vite",
+    "build": "cross-env NODE_ENV=production vite build",
+    "preview": "cross-env NODE_ENV=development vite preview",
     "prepare": "husky",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
@@ -20,6 +20,7 @@
     ]
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
