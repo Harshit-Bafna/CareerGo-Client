@@ -4,6 +4,7 @@ import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
   { ignores: ['dist', 'node_modules', 'build'] },
@@ -69,4 +70,5 @@ export default [
       'jsx-a11y/alt-text': 'error', // Require alt text for images
     },
   },
+  eslintConfigPrettier
 ];
