@@ -1,4 +1,4 @@
-.signInTxt{
+.authTxt{
     color: var(--color-navy-blue);
     font-size: var(--font-size-subheading);
 }
@@ -7,14 +7,14 @@
     color: var(--color-deep-blue);
 }
 
-.signinBtn{
+.authBtn{
     background-color: var(--color-deep-blue);
 }
 
-.signinBtn:hover{
+.authBtn:hover{
     background-color: var(--color-navy-blue);
 }
 
-.register{
+.accountStatus{
     color: var(--color-deep-blue);
 }
