@@ -1,0 +1,20 @@
+.signInTxt{
+    color: var(--color-navy-blue);
+    font-size: var(--font-size-subheading);
+}
+
+.forgotPassword{
+    color: var(--color-deep-blue);
+}
+
+.signinBtn{
+    background-color: var(--color-deep-blue);
+}
+
+.signinBtn:hover{
+    background-color: var(--color-navy-blue);
+}
+
+.register{
+    color: var(--color-deep-blue);
+}
