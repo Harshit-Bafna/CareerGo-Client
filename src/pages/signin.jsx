@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../styles/Auth.css'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
-import signin_img from '../assets/Login.svg'
+import signin_img from '../assets/signin.svg'
 import logo from '../assets/logo.png'
 
 const Login = () => {
@@ -65,7 +65,7 @@ const Login = () => {
                 </a>
                 <form className='space-y-4' onSubmit={handleSubmit}>
                     <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight">
-                        Sign in to your account
+                        Sign in to Your Account!
                     </h2>
                     <div>
                         <label
