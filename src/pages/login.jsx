@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import '../styles/Auth.css'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
-import signin_img from '../assets/login.webp'
-import logo_img from '../assets/logoIcon.png'
+import signin_img from '../assets/Login.svg'
+import logo from '../assets/logo.png'
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -54,55 +54,69 @@ const Login = () => {
     };
 
     return (
-        <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-16 items-center my-2 mx-5 md:mx-0 md:my-0">
-            <div className="hidden md:block md:w-1/3 max-w-sm">
-                <img src={signin_img} alt="signin" />
+        <section className="auth h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-0">
+            <div className="hidden md:block md:w-1/3 ">
+                <img className='h-96' src={signin_img} alt="signin" />
             </div>
 
-            <div className="md:w-1/3 max-w-sm">
-                <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                    <img src={logo_img} alt="logo" className="mx-auto h-20 w-auto" />
-                    <h2 className="authTxt mb-10 text-center font-bold tracking-tight">
+            <div className="w-full md:w-1/3 max-w-sm">
+                <a href="/">
+                    <img src={logo} alt="logo" className="mb-5 mx-auto h-9 w-auto" />
+                </a>
+                <form className='space-y-4' onSubmit={handleSubmit}>
+                    <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight">
                         Sign in to your account
                     </h2>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    <input
-                        className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
-                        type="text"
-                        placeholder="Email Address"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
-                    <div className="relative mt-4">
+                    <div>
+                        <label
+                            htmlFor="email"
+                            className="block mb-2 text-sm font-medium text-gray-900">
+                            Your email
+                        </label>
                         <input
-                            className="text-sm w-full px-4 py-2 border border-solid border-gray-300 rounded"
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            className="text-sm w-full px-4 py-2 border border-solid bg-gray-50 border-gray-300 rounded"
+                            type="text"
+                            placeholder="Email Address"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
-                        <span
-                            className="absolute inset-y-0 right-4 flex items-center cursor-pointer text-gray-500"
-                            onClick={() => setShowPassword(!showPassword)}
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    setShowPassword(!showPassword);
-                                }
-                            }}
-                            aria-label="Toggle password visibility"
-                        >
-                            {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                        </span>
+                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
-                    {errors.password && (
-                        <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-                    )}
-                    <div className="mt-4 flex justify-between font-semibold text-sm">
+                    <div>
+                        <label
+                            htmlFor="password"
+                            className="block mb-2 text-sm font-medium text-gray-900">
+                            Password
+                        </label>
+                        <div className="relative">
+                            <input
+                                className="text-sm w-full px-4 py-2 border border-solid bg-gray-50 border-gray-300 rounded"
+                                type={showPassword ? 'text' : 'password'}
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            <span
+                                className="absolute inset-y-0 right-4 flex items-center cursor-pointer text-gray-500"
+                                onClick={() => setShowPassword(!showPassword)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        setShowPassword(!showPassword);
+                                    }
+                                }}
+                                aria-label="Toggle password visibility"
+                            >
+                                {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                            </span>
+                        </div>
+                        {errors.password && (
+                            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
+                        )}
+                    </div>
+                    <div className="flex justify-between font-semibold text-sm">
                         <label className="flex text-slate-500 hover:text-slate-600 cursor-pointer">
                             <input className="mr-1" type="checkbox" />
                             <span>Remember Me</span>
@@ -116,7 +130,7 @@ const Login = () => {
                     </div>
                     <div className="text-center md:text-left">
                         <button
-                            className="authBtn mt-4 px-4 py-2 text-white uppercase rounded text-xs tracking-wider"
+                            className="authBtn w-full px-5 py-2 text-sm font-medium text-white rounded"
                             type="submit"
                         >
                             Sign In
@@ -129,7 +143,7 @@ const Login = () => {
                         className="accountStatus hover:underline hover:underline-offset-4"
                         href="/"
                     >
-                        Register
+                        Sign up
                     </a>
                 </div>
             </div>
@@ -138,3 +152,4 @@ const Login = () => {
 };
 
 export default Login;
+

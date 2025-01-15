@@ -16,7 +16,8 @@
     --color-deep-indigo: #142e49;
 
     /* Background Colors */
-    --background-light: var(--color-white);
+    --background-white: var(--color-white);
+    --background-light: #f1f3f7;
     --background-dark: var(--color-dark-gray);
     --background-accent: var(--color-navy-blue);
 
