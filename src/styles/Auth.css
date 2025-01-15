@@ -1,6 +1,5 @@
-.authTxt{
-    color: var(--color-navy-blue);
-    font-size: var(--font-size-subheading);
+.auth{
+    background-color: var(--background-light);
 }
 
 .forgotPassword{
