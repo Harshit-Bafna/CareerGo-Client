@@ -8,11 +8,10 @@ const Contact = () => {
                     <div className="w-full px-4 lg:w-1/2 xl:w-6/12">
                         <div className="mb-12 max-w-[570px] lg:mb-0">
                             <span className="mb-4 block text-base font-semibold text-blue-900">Contact Us</span>
-                            <h2 className="contactHeading mb-6 font-bold uppercase">
-                                GET IN TOUCH WITH US
-                            </h2>
+                            <h2 className="contactHeading mb-6 font-bold uppercase">GET IN TOUCH WITH US</h2>
                             <p className="mb-9 text-base leading-relaxed text-body-color dark:text-dark-6">
-                                CareerGo helps you make informed choices for your education, from selecting the right college to stream and school. Contact us for personalized guidance.
+                                CareerGo helps you make informed choices for your education, from selecting the right college to stream and school.
+                                Contact us for personalized guidance.
                             </p>
                             <div className="mb-6 flex w-full max-w-[370px]">
                                 <div className="mr-6 flex h-[50px] w-full max-w-[60px] items-center justify-center overflow-hidden rounded bg-blue-900/5 text-blue-900 sm:h-[50px] sm:max-w-[50px]">
