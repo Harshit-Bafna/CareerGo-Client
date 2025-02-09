@@ -10,6 +10,7 @@ export default {
         'deep-blue': 'var(--color-deep-blue)',
         'gold': 'var(--color-gold)',
         'light-gray': 'var(--color-light-gray)',
+        'off-white': '#f0ffff',
         'deep-indigo': 'var(--color-deep-indigo)',
         'background-white': 'var(--background-white)',
         'background-light': 'var(--background-light)',
