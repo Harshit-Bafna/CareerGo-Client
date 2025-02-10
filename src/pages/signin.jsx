@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { setError } from '../store/slices/errorSlice'
 import { useDispatch } from 'react-redux'
-import {validateEmail} from '../utils/helper/syncHelper'
+import { validateEmail } from '../utils/helper/syncHelper'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import signin_img from '../assets/signin.svg'
 import logo from '../assets/logo.png'
@@ -48,10 +48,10 @@ const Login = () => {
                         className="mb-5 mx-auto h-9 w-auto"
                     />
                 </a>
+                <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight mb-4">Sign in to Your Account!</h2>
                 <form
                     className="space-y-4"
                     onSubmit={handleSubmit}>
-                    <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight">Sign in to Your Account!</h2>
                     <div>
                         <label
                             htmlFor="email"
@@ -102,11 +102,7 @@ const Login = () => {
                         Forgot Password?
                     </a>
                     <div className="text-center md:text-left">
-                        <button
-                            className="bg-deep-blue hover:bg-navy-blue w-full px-5 py-2 text-sm font-medium text-white rounded"
-                            type="submit">
-                            Sign In
-                        </button>
+                        <button className="w-full bg-deep-blue text-white py-2 rounded-lg hover:bg-navy-blue transition">Sign In</button>
                     </div>
                 </form>
                 <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">

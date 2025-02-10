@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { setError } from '../store/slices/errorSlice'
 import { useDispatch } from 'react-redux'
-import {validateEmail, validatePassword} from '../utils/helper/syncHelper'
+import { validateEmail, validatePassword } from '../utils/helper/syncHelper'
 import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -163,15 +163,19 @@ const Login = () => {
                         </div>
                     </div>
                     <div>
-                        <input type="checkbox" className='mt-5 mb-2'/> 
-                        <label htmlFor="consent" className='text-sm'> Agree to terms and conditions </label>
+                        <input
+                            type="checkbox"
+                            className="mt-5 mb-2"
+                        />
+                        <label
+                            htmlFor="consent"
+                            className="text-sm">
+                            {' '}
+                            Agree to terms and conditions{' '}
+                        </label>
                     </div>
                     <div className="text-center md:text-left">
-                        <button
-                            className="bg-deep-blue hover:bg-navy-blue w-full px-5 py-2 text-sm font-medium text-white rounded"
-                            type="submit">
-                            Sign Up
-                        </button>
+                        <button className="w-full bg-deep-blue text-white py-2 rounded-lg hover:bg-navy-blue transition">Sign Up</button>
                     </div>
                 </form>
                 <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
