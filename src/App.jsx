@@ -2,12 +2,17 @@ import './App.css'
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearError } from './store/slices/errorSlice'
-import Home from './pages/Home'
+// import Home from './pages/Home'
+import Signup from './pages/signup'
+// import Signin from './pages/signin'
+// import Contact from './pages/contact'
+// import About from './pages/about'
 import Message from './components/Message'
-// import Loader from './components/Loader'
+import Loader from './components/Loader'
 
 function App() {
     const { isError, errorMessage } = useSelector((state) => state.error)
+    const { isLoading } = useSelector((state) => state.loader)
     const dispatch = useDispatch()
 
     useEffect(() => {
@@ -22,7 +27,12 @@ function App() {
     return (
         <>
             {isError && errorMessage && <Message message={errorMessage} isTypeError={true} />}
-            <Home />
+            {isLoading && <Loader />}
+            {/* <Home /> */}
+            <Signup/>
+            {/* <Signin/> */}
+            {/* <About/> */}
+            {/* <Contact/> */}
         </>
     )
 }

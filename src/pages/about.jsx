@@ -1,10 +1,9 @@
+import Navbar from '../components/ui/Navbar'
+import Footer from '../components/ui/Footer'
 import AboutImg from '../assets/about.avif'
 import promiseImg from '../assets/promiseIcon.svg'
 import partnershipImg from '../assets/partnershipIcon.svg'
 import impactImg from '../assets/impactIcon.svg'
-import '../styles/AboutUs.css'
-import Navbar from '../components/ui/Navbar'
-import Footer from '../components/ui/Footer'
 
 const About = () => {
     return (

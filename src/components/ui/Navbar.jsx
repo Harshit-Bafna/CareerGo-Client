@@ -17,7 +17,7 @@ const Navbar = () => {
 
     return (
         <div className="w-full h-16">
-            <div className="fixed bg-white w-full shadow-input-shadow flex justify-between items-center h-16 px-16">
+            <div className="fixed z-50 bg-white w-full shadow-input-shadow flex justify-between items-center h-16 px-16">
                 <a href="/">
                     <img
                         src={logo}

@@ -1,97 +1,83 @@
 import { useState } from 'react'
-import '../styles/Auth.css'
-import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
+import { setError } from '../store/slices/errorSlice'
+import { useDispatch } from 'react-redux'
+import {validateEmail, validatePassword} from '../utils/helper/syncHelper'
 import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 
 const Login = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [showPassword, setShowPassword] = useState(false);
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [errors, setErrors] = useState({ name: '', email: '', password: '', confirmPassword: '' });
+    const dispatch = useDispatch()
 
-    const validateEmail = (email) => {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    };
-
-    const validatePassword = (password) => {
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        return passwordRegex.test(password);
-    };
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
     const handleSubmit = (e) => {
-        e.preventDefault();
-        let valid = true;
+        e.preventDefault()
 
         if (!name) {
-            setErrors((prev) => ({ ...prev, name: 'Name cannot be empty' }));
-            valid = false;
-        } else {
-            setErrors((prev) => ({ ...prev, name: '' }));
-        }
-
-        if (!email) {
-            setErrors((prev) => ({ ...prev, email: 'Email cannot be empty' }));
-            valid = false;
+            const errorMessage = 'Name is required.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!email) {
+            const errorMessage = 'Email is required.'
+            dispatch(setError(errorMessage))
+            return
         } else if (!validateEmail(email)) {
-            setErrors((prev) => ({ ...prev, email: 'Invalid email format' }));
-            valid = false;
-        } else {
-            setErrors((prev) => ({ ...prev, email: '' }));
-        }
-
-        if (!password) {
-            setErrors((prev) => ({ ...prev, password: 'Password cannot be empty' }));
-            valid = false;
+            const errorMessage = 'Invalid email format.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!password) {
+            const errorMessage = 'Password is required.'
+            dispatch(setError(errorMessage))
+            return
         } else if (!validatePassword(password)) {
-            setErrors((prev) => ({
-                ...prev,
-                password: 'Password must be at least 8 characters, include an uppercase letter, a lowercase letter, a number, and a special character',
-            }));
-            valid = false;
-        } else {
-            setErrors((prev) => ({ ...prev, password: '' }));
+            const errorMessage =
+                'Password must be at least 8 characters, include an uppercase letter, a lowercase letter, a number, and a special character.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!confirmPassword) {
+            const errorMessage = 'Confirm password is required.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (password !== confirmPassword) {
+            const errorMessage = 'Passwords do not match.'
+            dispatch(setError(errorMessage))
+            return
         }
-        
-        if (!confirmPassword) {
-            setErrors((prev) => ({ ...prev, confirmPassword: 'Confirm password cannot be empty' }));
-            valid = false;
-        } else if (confirmPassword !== password) {
-            setErrors((prev) => ({ ...prev, confirmPassword: 'Passwords do not match' }));
-            valid = false;
-        } else {
-            setErrors((prev) => ({ ...prev, confirmPassword: '' }));
-        }
-
-        if (valid) {
-            // console.log('Form Submitted', { email, password });
-            // Perform your API call or action here
-        }
-    };
+    }
 
     return (
-        <section className="auth h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-0">
+        <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-0">
             <div className="hidden md:block md:w-1/3 ">
-                <img className='h-96' src={signin_img} alt="signin" />
+                <img
+                    className="h-96"
+                    src={signin_img}
+                    alt="signin"
+                />
             </div>
 
             <div className="w-full md:w-1/3 max-w-sm">
                 <a href="/">
-                    <img src={logo} alt="logo" className="mb-5 mx-auto h-9 w-auto" />
+                    <img
+                        src={logo}
+                        alt="logo"
+                        className="mb-2 mx-auto h-9 w-auto"
+                    />
                 </a>
-                <form className='space-y-1' onSubmit={handleSubmit}>
-                    <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight">
-                        Start Your Journey with Us!
-                    </h2>
+                <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight mb-4">Start Your Journey with Us!</h2>
+                <form
+                    className="space-y-2"
+                    onSubmit={handleSubmit}>
                     <div>
                         <label
                             htmlFor="name"
                             className="block mb-2 text-sm font-medium text-gray-900">
-                            Your Name
+                            Name <span className="text-red-700">*</span>
                         </label>
                         <input
                             className="text-sm w-full px-4 py-2 border border-solid bg-gray-50 border-gray-300 rounded"
@@ -100,14 +86,13 @@ const Login = () => {
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
-                        {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
                     </div>
 
                     <div>
                         <label
                             htmlFor="email"
                             className="block mb-2 text-sm font-medium text-gray-900">
-                            Your email
+                            Email <span className="text-red-700">*</span>
                         </label>
                         <input
                             className="text-sm w-full px-4 py-2 border border-solid bg-gray-50 border-gray-300 rounded"
@@ -116,13 +101,12 @@ const Login = () => {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
-                        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
                     </div>
                     <div>
                         <label
                             htmlFor="password"
                             className="block mb-2 text-sm font-medium text-gray-900">
-                            Password
+                            Password <span className="text-red-700">*</span>
                         </label>
                         <div className="relative">
                             <input
@@ -139,24 +123,20 @@ const Login = () => {
                                 tabIndex={0}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        setShowPassword(!showPassword);
+                                        e.preventDefault()
+                                        setShowPassword(!showPassword)
                                     }
                                 }}
-                                aria-label="Toggle password visibility"
-                            >
+                                aria-label="Toggle password visibility">
                                 {showPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                             </span>
                         </div>
-                        {errors.password && (
-                            <p className="text-red-500 text-xs mt-1">{errors.password}</p>
-                        )}
                     </div>
                     <div>
                         <label
                             htmlFor="confirmPassword"
                             className="block mb-2 text-sm font-medium text-gray-900">
-                            Confirm Password
+                            Confirm Password <span className="text-red-700">*</span>
                         </label>
                         <div className="relative">
                             <input
@@ -173,35 +153,23 @@ const Login = () => {
                                 tabIndex={0}
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' || e.key === ' ') {
-                                        e.preventDefault();
-                                        setShowConfirmPassword(!showConfirmPassword);
+                                        e.preventDefault()
+                                        setShowConfirmPassword(!showConfirmPassword)
                                     }
                                 }}
-                                aria-label="Toggle confirm password visibility"
-                            >
+                                aria-label="Toggle confirm password visibility">
                                 {showConfirmPassword ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                             </span>
                         </div>
-
-                        {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
                     </div>
-                    <div className="flex justify-between font-semibold text-sm">
-                        <label className="mt-2 mb-1 flex text-slate-500 hover:text-slate-600 cursor-pointer">
-                            <input className="mr-1" type="checkbox" />
-                            <span>Remember Me</span>
-                        </label>
-                        <a
-                            className="mt-2 mb-1 forgotPassword hover:underline hover:underline-offset-4"
-                            href="/"
-                        >
-                            Forgot Password?
-                        </a>
+                    <div>
+                        <input type="checkbox" className='mt-5 mb-2'/> 
+                        <label htmlFor="consent" className='text-sm'> Agree to terms and conditions </label>
                     </div>
                     <div className="text-center md:text-left">
                         <button
-                            className="authBtn w-full px-5 py-2 text-sm font-medium text-white rounded"
-                            type="submit"
-                        >
+                            className="bg-deep-blue hover:bg-navy-blue w-full px-5 py-2 text-sm font-medium text-white rounded"
+                            type="submit">
                             Sign Up
                         </button>
                     </div>
@@ -209,16 +177,14 @@ const Login = () => {
                 <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
                     Already have an account?{' '}
                     <a
-                        className="accountStatus hover:underline hover:underline-offset-4"
-                        href="/"
-                    >
+                        className="text-deep-blue hover:underline hover:underline-offset-4"
+                        href="/">
                         Sign in
                     </a>
                 </div>
             </div>
         </section>
-    );
-};
+    )
+}
 
-export default Login;
-
+export default Login
