@@ -8,7 +8,7 @@ import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { EUserRole } from '../utils/constants/applicationsEnum'
 
-const Login = () => {
+const Signup = () => {
     const dispatch = useDispatch()
 
     const [name, setName] = useState('')
@@ -210,4 +210,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default Signup

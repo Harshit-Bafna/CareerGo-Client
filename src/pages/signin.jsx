@@ -7,7 +7,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import signin_img from '../assets/signin.svg'
 import logo from '../assets/logo.png'
 
-const Login = () => {
+const Signin = () => {
     const dispatch = useDispatch()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -126,4 +126,4 @@ const Login = () => {
     )
 }
 
-export default Login
+export default Signin
