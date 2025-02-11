@@ -3,9 +3,9 @@ import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearError } from './store/slices/errorSlice'
 // import Home from './pages/Home'
-import Signup from './pages/signup'
+// import Signup from './pages/signup'
 import Signin from './pages/signin'
-import ForgotPassword from './pages/forgotPassword'
+// import ForgotPassword from './pages/forgotPassword'
 // import Contact from './pages/contact'
 // import About from './pages/about'
 import Message from './components/Message'
@@ -30,9 +30,9 @@ function App() {
             {isError && errorMessage && <Message message={errorMessage} isTypeError={true} />}
             {isLoading && <Loader />}
             {/* <Home /> */}
-            <Signup/>
+            {/* <Signup/> */}
             <Signin/>
-            <ForgotPassword/>
+            {/* <ForgotPassword/> */}
             {/* <About/> */}
             {/* <Contact/> */}
         </>

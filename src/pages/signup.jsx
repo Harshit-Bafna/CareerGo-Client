@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { setError } from '../store/slices/errorSlice'
 import { useDispatch } from 'react-redux'
+import { setError } from '../store/slices/errorSlice'
+import { registerUser } from '../store/slices/authSlice'
 import { validateEmail, validatePassword } from '../utils/helper/syncHelper'
 import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
+import { EUserRole } from '../utils/constants/applicationsEnum'
 
 const Login = () => {
     const dispatch = useDispatch()
@@ -15,6 +17,7 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+    const [conscent, setConscent] = useState(false)
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -48,7 +51,21 @@ const Login = () => {
             const errorMessage = 'Passwords do not match.'
             dispatch(setError(errorMessage))
             return
+        } else if (!conscent) {
+            const errorMessage = 'Please agree to terms and conditions'
+            dispatch(setError(errorMessage))
+            return
         }
+
+        const payload = {
+            name: name,
+            emailAddress: email,
+            password: password,
+            conscent: conscent,
+            role: EUserRole.USER,
+        }
+
+        dispatch(registerUser(payload))
     }
 
     return (
@@ -166,9 +183,11 @@ const Login = () => {
                         <input
                             type="checkbox"
                             className="mt-5 mb-2"
+                            checked={conscent}
+                            onChange={(e) => setConscent(e.target.checked)}    
                         />
                         <label
-                            htmlFor="consent"
+                            htmlFor="conscent"
                             className="text-sm">
                             {' '}
                             Agree to terms and conditions{' '}

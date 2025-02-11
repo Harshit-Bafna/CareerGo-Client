@@ -1,6 +1,7 @@
 import { useState } from 'react'
-import { setError } from '../store/slices/errorSlice'
 import { useDispatch } from 'react-redux'
+import { setError } from '../store/slices/errorSlice'
+import { userLogin } from '../store/slices/authSlice'
 import { validateEmail } from '../utils/helper/syncHelper'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import signin_img from '../assets/signin.svg'
@@ -28,6 +29,13 @@ const Login = () => {
             dispatch(setError(errorMessage))
             return
         }
+
+        const payload = {
+            emailAddress: email,
+            password,
+        }
+
+        dispatch(userLogin(payload))
     }
 
     return (
