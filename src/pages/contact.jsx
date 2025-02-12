@@ -1,7 +1,57 @@
+import { useState } from 'react'
 import bgimg from '../assets/contactBg.png'
 import { HiLocationMarker, HiPhone, HiMail } from 'react-icons/hi'
+import { useDispatch } from 'react-redux'
+import { setError } from '../store/slices/errorSlice'
+import { validateEmail } from '../utils/helper/syncHelper'
+import { contactEmailTemplate } from '../utils/template/contactEmailTemplate'
+import { sendEmail } from '../store/slices/emailSlice'
 
 const Contact = () => {
+    const dispatch = useDispatch()
+    const [name, setName] = useState('')
+    const [email, setEmail] = useState('')
+    const [phone, setPhone] = useState('')
+    const [message, setMessage] = useState('')
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        if (!name) {
+            const errorMessage = 'Name is required.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!email) {
+            const errorMessage = 'Email is required.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!validateEmail(email)) {
+            const errorMessage = 'Invalid email format.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!phone) {
+            const errorMessage = 'Phone number is required.'
+            dispatch(setError(errorMessage))
+            return
+        } else if (!message) {
+            const errorMessage = 'Message is required.'
+            dispatch(setError(errorMessage))
+            return
+        }
+
+        const payload = {
+            emailAddress: 'bafnaharshit7891@gmail.com',
+            subject: `New Contact Request from ${name}`,
+            body: contactEmailTemplate(name, email, phone, message),
+        }
+
+        dispatch(sendEmail(payload))
+        setName('')
+        setEmail('')
+        setPhone('')
+        setMessage('')
+    }
+
     return (
         <section className="relative z-10 overflow-hidden bg-white py-10 md:px-20 sm:px-10 px-0 my-4">
             <div className="container">
@@ -63,27 +113,35 @@ const Contact = () => {
                         className="w-full px-4 lg:w-1/2 bg-cover bg-center"
                         style={{ backgroundImage: `url(${bgimg})` }}>
                         <div className="relative rounded-lg bg-white mx-3 p-8 mt-2 shadow-lg dark:bg-dark-2 sm:p-12">
-                            <form>
+                            <form onSubmit={handleSubmit}>
                                 <ContactInputBox
                                     type="text"
                                     name="name"
                                     placeholder="Your Name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                 />
                                 <ContactInputBox
                                     type="text"
                                     name="email"
                                     placeholder="Your Email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                                 <ContactInputBox
                                     type="text"
                                     name="phone"
                                     placeholder="Your Phone"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
                                 />
                                 <ContactTextArea
                                     row="5"
                                     placeholder="Your Message"
-                                    name="details"
+                                    name="message"
                                     defaultValue=""
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
                                 />
                                 <div>
                                     <button
@@ -120,27 +178,31 @@ const Contact = () => {
 
 export default Contact
 
-const ContactTextArea = ({ row, placeholder, name, defaultValue }) => {
+const ContactTextArea = ({ row, placeholder, name, defaultValue, value, onChange }) => {
     return (
         <div className="mb-4">
             <textarea
                 rows={row}
                 placeholder={placeholder}
                 name={name}
-                className="text-[13.5px] w-full resize-none rounded border border-stroke px-[14px] py-2 text-base text-body-color outline-none"
                 defaultValue={defaultValue}
+                value={value}
+                onChange={onChange}
+                className="text-[13.5px] w-full resize-none rounded border border-stroke px-[14px] py-2 text-base text-body-color outline-none"
             />
         </div>
     )
 }
 
-const ContactInputBox = ({ type, placeholder, name }) => {
+const ContactInputBox = ({ type, placeholder, name, value, onChange }) => {
     return (
         <div className="mb-4">
             <input
                 type={type}
                 placeholder={placeholder}
                 name={name}
+                value={value}
+                onChange={onChange}
                 className="text-[13.5px] w-full rounded border border-stroke px-[12px] py-1 text-base text-body-color outline-none"
             />
         </div>
