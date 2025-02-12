@@ -4,10 +4,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { clearError } from './store/slices/errorSlice'
 // import Home from './pages/Home'
 // import Signup from './pages/signup'
-import Signin from './pages/signin'
+// import Signin from './pages/signin'
 // import ForgotPassword from './pages/forgotPassword'
 // import Contact from './pages/contact'
 // import About from './pages/about'
+import PageNotFound from './pages/PageNotFound'     
 import Message from './components/Message'
 import Loader from './components/Loader'
 
@@ -29,9 +30,10 @@ function App() {
         <>
             {isError && errorMessage && <Message message={errorMessage} isTypeError={true} />}
             {isLoading && <Loader />}
+            <PageNotFound/>
             {/* <Home /> */}
             {/* <Signup/> */}
-            <Signin/>
+            {/* <Signin/> */}
             {/* <ForgotPassword/> */}
             {/* <About/> */}
             {/* <Contact/> */}
