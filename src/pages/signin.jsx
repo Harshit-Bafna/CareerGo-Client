@@ -6,6 +6,7 @@ import { validateEmail } from '../utils/helper/syncHelper'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import signin_img from '../assets/signin.svg'
 import logo from '../assets/logo.png'
+import { NavLink } from 'react-router-dom'
 
 const Signin = () => {
     const dispatch = useDispatch()
@@ -49,13 +50,13 @@ const Signin = () => {
             </div>
 
             <div className="w-full md:w-1/3 max-w-sm">
-                <a href="/">
+                <NavLink to="/">
                     <img
                         src={logo}
                         alt="logo"
                         className="mb-5 mx-auto h-9 w-auto"
                     />
-                </a>
+                </NavLink>
                 <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight mb-4">Sign in to Your Account!</h2>
                 <form
                     className="space-y-4"
@@ -115,11 +116,11 @@ const Signin = () => {
                 </form>
                 <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
                     Don&apos;t have an account?{' '}
-                    <a
+                    <NavLink
                         className="text-deep-blue hover:underline hover:underline-offset-4"
-                        href="/">
+                        to="/signup">
                         Sign up
-                    </a>
+                    </NavLink>
                 </div>
             </div>
         </section>

@@ -7,6 +7,7 @@ import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { EUserRole } from '../utils/constants/applicationsEnum'
+import { NavLink } from 'react-router-dom'
 
 const Signup = () => {
     const dispatch = useDispatch()
@@ -79,13 +80,13 @@ const Signup = () => {
             </div>
 
             <div className="w-full md:w-1/3 max-w-sm">
-                <a href="/">
+                <NavLink to="/">
                     <img
                         src={logo}
                         alt="logo"
                         className="mb-2 mx-auto h-9 w-auto"
                     />
-                </a>
+                </NavLink>
                 <h2 className="text-gray-900 text-xl md:text-2xl font-bold tracking-tight mb-4">Start Your Journey with Us!</h2>
                 <form
                     className="space-y-2"
@@ -184,7 +185,7 @@ const Signup = () => {
                             type="checkbox"
                             className="mt-5 mb-2"
                             checked={conscent}
-                            onChange={(e) => setConscent(e.target.checked)}    
+                            onChange={(e) => setConscent(e.target.checked)}
                         />
                         <label
                             htmlFor="conscent"
@@ -199,11 +200,11 @@ const Signup = () => {
                 </form>
                 <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
                     Already have an account?{' '}
-                    <a
+                    <NavLink
                         className="text-deep-blue hover:underline hover:underline-offset-4"
-                        href="/">
+                        to="/signin">
                         Sign in
-                    </a>
+                    </NavLink>
                 </div>
             </div>
         </section>

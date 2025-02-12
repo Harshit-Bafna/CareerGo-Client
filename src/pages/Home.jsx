@@ -1,6 +1,4 @@
 import { useState } from 'react'
-import Navbar from '../components/ui/Navbar'
-import Footer from '../components/ui/Footer'
 import HomeBanner from '../assets/homeBanner.jpg'
 import careerImg from '../assets/career-assessment.jpg'
 import person1 from '../assets/person1.jpg'
@@ -134,7 +132,6 @@ export default function Home() {
 
     return (
         <>
-            <Navbar />
             <section className="flex flex-col md:flex-row items-center justify-between px-8 md:px-16 lg:px-24 py-16">
                 <div className="md:w-1/2 text-center md:text-left">
                     <h1 className="text-4xl md:text-5xl font-bold text-dark-gray leading-tight">
@@ -253,7 +250,7 @@ export default function Home() {
                     <div className="flex gap-2">
                         {Array.from({ length: totalPages }).map((_, i) => (
                             <span
-                                key={`page-dot-${i+1}`}
+                                key={`page-dot-${i + 1}`}
                                 className={`w-2 h-2 rounded-full ${i === page ? 'bg-gray-900' : 'bg-gray-400'}`}></span>
                         ))}
                     </div>
@@ -353,8 +350,6 @@ export default function Home() {
                     </div>
                 </div>
             </section>
-
-            <Footer />
         </>
     )
 }

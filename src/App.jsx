@@ -2,15 +2,10 @@ import './App.css'
 import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearError } from './store/slices/errorSlice'
-// import Home from './pages/Home'
-// import Signup from './pages/signup'
-// import Signin from './pages/signin'
-// import ForgotPassword from './pages/forgotPassword'
-// import Contact from './pages/contact'
-// import About from './pages/about'
-import PageNotFound from './pages/PageNotFound'     
 import Message from './components/Message'
 import Loader from './components/Loader'
+import { Router } from './Router'
+import { RouterProvider } from 'react-router-dom'
 
 function App() {
     const { isError, errorMessage } = useSelector((state) => state.error)
@@ -28,15 +23,15 @@ function App() {
 
     return (
         <>
-            {isError && errorMessage && <Message message={errorMessage} isTypeError={true} />}
+            {isError && errorMessage && (
+                <Message
+                    message={errorMessage}
+                    isTypeError={true}
+                />
+            )}
             {isLoading && <Loader />}
-            <PageNotFound/>
-            {/* <Home /> */}
-            {/* <Signup/> */}
-            {/* <Signin/> */}
-            {/* <ForgotPassword/> */}
-            {/* <About/> */}
-            {/* <Contact/> */}
+
+            <RouterProvider router={Router} />
         </>
     )
 }

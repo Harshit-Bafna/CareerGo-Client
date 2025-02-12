@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import { validateEmail } from '../utils/helper/syncHelper'
 import logo from '../assets/logo.png'
 import forgotPasswordImg from '../assets/forgotPassword.svg'
+import { NavLink } from 'react-router-dom'
 
 const ForgotPassword = () => {
     const dispatch = useDispatch()
@@ -35,13 +36,13 @@ const ForgotPassword = () => {
             </div>
 
             <div className="w-full md:w-1/2 flex flex-col items-center px-6 md:px-16">
-                <a href="/">
+                <NavLink to="/">
                     <img
                         src={logo}
                         alt="logo"
                         className="mb-5 mx-auto h-9 w-auto"
                     />
-                </a>
+                </NavLink>
                 <h2 className="text-2xl md:text-4xl font-bold text-dark-gray mb-3">Forgot your password?</h2>
                 <p className="text-gray-600 text-center mb-6 max-w-sm">
                     Do not worry, happens to all of us. Enter your registered email below to recover your password.
@@ -67,7 +68,7 @@ const ForgotPassword = () => {
                     <button className="mt-4 w-full bg-deep-blue text-white py-2 rounded-lg hover:bg-navy-blue transition">Continue</button>
 
                     <div className="mt-4 text-center">
-                        <a href="/" className="text-dark-gray font-medium hover:underline">&lt; Back to Login</a>
+                        <NavLink to="/signin" className="text-dark-gray font-medium hover:underline">&lt; Back to Login</NavLink>
                     </div>
                 </form>
             </div>
