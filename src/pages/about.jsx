@@ -2,14 +2,9 @@ import AboutImg from '../assets/about.avif'
 import promiseImg from '../assets/promiseIcon.svg'
 import partnershipImg from '../assets/partnershipIcon.svg'
 import impactImg from '../assets/impactIcon.svg'
-import '../styles/AboutUs.css'
-import Navbar from '../components/ui/Navbar'
-import Footer from '../components/ui/Footer'
 
 const About = () => {
     return (
-        <>
-        <Navbar/>
         <div className="aboutUs 2xl:container 2xl:mx-auto lg:py-16 lg:px-20 md:py-12 py-9 px-8">
             <div className="flex md:flex-row flex-col lg:gap-14 sm:gap-10 gap-12 justify-between items-center">
                 <div className="w-full md:w-7/12">
@@ -60,7 +55,11 @@ const About = () => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 lg:gap-8 gap-6">
                         <div className="flex p-4 shadow-md">
                             <div className="mr-6">
-                                <img className='h-20' src={promiseImg} alt="promise" />
+                                <img
+                                    className="h-20"
+                                    src={promiseImg}
+                                    alt="promise"
+                                />
                             </div>
                             <div className="">
                                 <p className="font-semibold lg:text-xl text-lg  text-gray-800">Our Promise</p>
@@ -72,7 +71,11 @@ const About = () => {
 
                         <div className="flex p-4 shadow-md">
                             <div className="mr-6">
-                                <img className='h-20' src={partnershipImg} alt="Partnerships" />
+                                <img
+                                    className="h-20"
+                                    src={partnershipImg}
+                                    alt="Partnerships"
+                                />
                             </div>
                             <div className="">
                                 <p className="font-semibold lg:text-xl text-lg  text-gray-800">Partnerships</p>
@@ -84,12 +87,17 @@ const About = () => {
 
                         <div className="flex p-4 shadow-md">
                             <div className="mr-6">
-                                <img className='h-20' src={impactImg} alt="impact" />
+                                <img
+                                    className="h-20"
+                                    src={impactImg}
+                                    alt="impact"
+                                />
                             </div>
                             <div className="">
                                 <p className="font-semibold lg:text-xl text-lg  text-gray-800">Impact</p>
                                 <p className="mt-1 font-normal text-base text-gray-600">
-                                    Revolutionizing career choices by connecting students with the right colleges, streams, and schools for their aspirations.
+                                    Revolutionizing career choices by connecting students with the right colleges, streams, and schools for their
+                                    aspirations.
                                 </p>
                             </div>
                         </div>
@@ -97,8 +105,6 @@ const About = () => {
                 </div>
             </div>
         </div>
-        <Footer/>
-        </>
     )
 }
 
