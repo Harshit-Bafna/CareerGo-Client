@@ -7,6 +7,9 @@ import Contact from './pages/Contact'
 import PageNotFound from './pages/PageNotFound'
 import Signin from './pages/Signin'
 import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
+import SentEmail from './pages/SentEmail'
 
 export const Router = createBrowserRouter(
     createRoutesFromElements(
@@ -18,6 +21,18 @@ export const Router = createBrowserRouter(
             <Route
                 path="/signup"
                 element={<Signup />}
+            />
+            <Route
+                path="/forgotPassword"
+                element={<ForgotPassword />}
+            />
+            <Route
+                path="/forgotPassword/sentEmail"
+                element={<SentEmail message={'forgot pass'} />}
+            />
+            <Route
+                path="/resetPassword/:token"
+                element={<ResetPassword />}
             />
 
             <Route

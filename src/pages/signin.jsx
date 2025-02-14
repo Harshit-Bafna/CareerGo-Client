@@ -105,11 +105,11 @@ const Signin = () => {
                             </span>
                         </div>
                     </div>
-                    <a
+                    <NavLink
                         className="mt-2 mb-1 block text-right font-semibold text-sm text-deep-blue hover:underline hover:underline-offset-4"
-                        href="/">
+                        to="/forgotPassword">
                         Forgot Password?
-                    </a>
+                    </NavLink>
                     <div className="text-center md:text-left">
                         <button className="w-full bg-deep-blue text-white py-2 rounded-lg hover:bg-navy-blue transition">Sign In</button>
                     </div>

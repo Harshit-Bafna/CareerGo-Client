@@ -39,13 +39,13 @@ export const registerUser = createAsyncThunk('auth/create', async (userPayload, 
 
 export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading());
+        thunkAPI.dispatch(startLoading())
 
         const { data } = await axios.post(`${serverURL}/${authURL}/login`, loginPayload, { withCredentials: true });
 
         if (!data.success) {
-            thunkAPI.dispatch(setError(data.message));
-            return thunkAPI.rejectWithValue(data.message);
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
         }
 
         return data;
@@ -53,12 +53,62 @@ export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thu
         const errorMessage =
             axios.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
-                : 'Something went wrong';
+                : 'Something went wrong'
 
-        thunkAPI.dispatch(setError(errorMessage));
-        return thunkAPI.rejectWithValue(errorMessage);
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
     } finally {
-        thunkAPI.dispatch(stopLoading());
+        thunkAPI.dispatch(stopLoading())
+    }
+});
+
+export const forgetPassword = createAsyncThunk('auth/forgotPassword', async (Payload, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading());
+
+        const { data } = await axios.put(`${serverURL}/${authURL}/forgot-password?emailAddress=${Payload.emailAddress}`, { withCredentials: true })
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        return data;
+    } catch (error) {
+        const errorMessage =
+            axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
+    }
+});
+
+export const resetPassword = createAsyncThunk('auth/resetPassword', async (Payload, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading());
+
+        const { data } = await axios.put(`${serverURL}/${authURL}/reset-password/${Payload.token}`, Payload, { withCredentials: true })
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        return data;
+    } catch (error) {
+        const errorMessage =
+            axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
     }
 });
 
