@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { startLoading, stopLoading } from "./loaderSlice"
 import { setError } from "./errorSlice"
+import { setSuccess } from "./messageSlice"
 import axios from "axios"
 import config from "../../data/config"
+import successMessage from "../../utils/constants/successMessage"
 
 const serverURL = config.SERVER_URL
 const authURL = 'api/v1/auth'
@@ -22,6 +24,8 @@ export const registerUser = createAsyncThunk('auth/create', async (userPayload, 
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
 
         return data
     } catch (error) {
@@ -48,6 +52,8 @@ export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thu
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.userLogin))
+
         return data;
     } catch (error) {
         const errorMessage =
@@ -73,6 +79,8 @@ export const forgetPassword = createAsyncThunk('auth/forgotPassword', async (Pay
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.userForgotPassword))
+
         return data;
     } catch (error) {
         const errorMessage =
@@ -97,6 +105,8 @@ export const resetPassword = createAsyncThunk('auth/resetPassword', async (Paylo
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.userResetPassword))
 
         return data;
     } catch (error) {
