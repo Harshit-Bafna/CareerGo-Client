@@ -7,10 +7,11 @@ import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import { EUserRole } from '../utils/constants/applicationsEnum'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const Signup = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -20,7 +21,7 @@ const Signup = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [conscent, setConscent] = useState(false)
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault()
 
         if (!name) {
@@ -66,7 +67,11 @@ const Signup = () => {
             role: EUserRole.USER,
         }
 
-        dispatch(registerUser(payload))
+        const response = await dispatch(registerUser(payload))
+
+        if (response.meta.requestStatus === 'fulfilled') {
+            navigate('/sentEmail', { state: { SentEmailMessage: 'Check your email to verify the account...' } })
+        }
     }
 
     return (

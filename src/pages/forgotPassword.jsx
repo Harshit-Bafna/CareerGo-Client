@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         const response = await dispatch(forgetPassword(payload))
 
         if (response.meta.requestStatus === 'fulfilled') {
-            navigate('/forgotPassword/sentEmail')
+            navigate('/sentEmail', { state: { SentEmailMessage: 'Check your email to reset password...' } })
         }
     }
 

@@ -10,6 +10,7 @@ import Signup from './pages/Signup'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import SentEmail from './pages/SentEmail'
+import EmailVerification from './pages/EmailVerification'
 
 export const Router = createBrowserRouter(
     createRoutesFromElements(
@@ -27,12 +28,16 @@ export const Router = createBrowserRouter(
                 element={<ForgotPassword />}
             />
             <Route
-                path="/forgotPassword/sentEmail"
-                element={<SentEmail message={'forgot pass'} />}
+                path="/sentEmail"
+                element={<SentEmail/>}
             />
             <Route
                 path="/resetPassword/:token"
                 element={<ResetPassword />}
+            />
+            <Route
+                path="/confirmation/:token"
+                element={<EmailVerification />}
             />
 
             <Route

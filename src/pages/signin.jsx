@@ -6,15 +6,17 @@ import { validateEmail } from '../utils/helper/syncHelper'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import signin_img from '../assets/signin.svg'
 import logo from '../assets/logo.png'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const Signin = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault()
 
         if (!email) {
@@ -36,7 +38,11 @@ const Signin = () => {
             password,
         }
 
-        dispatch(userLogin(payload))
+        const response = await dispatch(userLogin(payload))
+
+        if (response.meta.requestStatus === 'fulfilled') {
+            navigate('/')
+        }
     }
 
     return (

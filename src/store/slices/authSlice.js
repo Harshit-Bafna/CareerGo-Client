@@ -2,9 +2,9 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { startLoading, stopLoading } from "./loaderSlice"
 import { setError } from "./errorSlice"
 import { setSuccess } from "./messageSlice"
+import successMessage from "../../utils/constants/successMessage"
 import axios from "axios"
 import config from "../../data/config"
-import successMessage from "../../utils/constants/successMessage"
 
 const serverURL = config.SERVER_URL
 const authURL = 'api/v1/auth'
@@ -12,6 +12,8 @@ const authURL = 'api/v1/auth'
 const initialState = {
     isLoggedIn: false,
     data: null,
+    token: null,
+    code: null
 }
 
 export const registerUser = createAsyncThunk('auth/create', async (userPayload, thunkAPI) => {
@@ -27,7 +29,11 @@ export const registerUser = createAsyncThunk('auth/create', async (userPayload, 
 
         thunkAPI.dispatch(setSuccess(successMessage.userRegister))
 
-        return data
+        const { token, code } = data.data.newUser.accountConfirmation;
+
+        return { user: data.data.newUser, token, code };
+
+        // return data
     } catch (error) {
         const errorMessage =
             axios.isAxiosError(error) && error.response?.data?.message
@@ -122,6 +128,33 @@ export const resetPassword = createAsyncThunk('auth/resetPassword', async (Paylo
     }
 });
 
+export const verifyEmail = createAsyncThunk('auth/confirmation', async (Payload, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading());
+
+        const { data } = await axios.put(`${serverURL}/${authURL}/confirmation/${Payload.token}?code=${Payload.code}`, {}, { withCredentials: true })
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        thunkAPI.dispatch(setSuccess(successMessage.userVerifyEmail))
+
+        return data;
+    } catch (error) {
+        const errorMessage =
+            axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
+    }
+});
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,
@@ -138,6 +171,11 @@ const authSlice = createSlice({
             .addCase(userLogin.rejected, (state) => {
                 state.isLoggedIn = false
             })
+            .addCase(registerUser.fulfilled, (state, action) => {
+                state.data = action.payload.user;
+                state.token = action.payload.token;
+                state.code = action.payload.code;
+            });
     },
 })
 
