@@ -19,6 +19,7 @@ import {
     FaPhoneAlt,
     FaMapMarkerAlt,
 } from 'react-icons/fa'
+import { useBtnNavigation } from '../utils/helper/syncHelper'
 
 const features = [
     {
@@ -142,10 +143,14 @@ export default function Home() {
                         path for your future with our expert resources and support.
                     </p>
                     <div className="mt-6 flex justify-center md:justify-start space-x-4">
-                        <button className="bg-deep-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-blue transition">
+                        <button
+                            onClick={useBtnNavigation('/signin')}
+                            className="bg-deep-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-navy-blue transition">
                             Get Started
                         </button>
-                        <button className="border border-deep-blue text-deep-blue px-6 py-3 rounded-lg font-semibold hover:bg-deep-blue hover:text-white transition">
+                        <button
+                            onClick={useBtnNavigation('/contact')}
+                            className="border border-deep-blue text-deep-blue px-6 py-3 rounded-lg font-semibold hover:bg-deep-blue hover:text-white transition">
                             Contact Us
                         </button>
                     </div>
@@ -277,7 +282,11 @@ export default function Home() {
                         Unlock your potential with a free consultation or career assessment tailored just for you.
                     </p>
                     <div className="flex justify-center gap-4 flex-col md:flex-row">
-                        <button className="bg-deep-blue text-white px-6 py-2 hover:bg-navy-blue transition w-full md:w-auto">Sign Up</button>
+                        <button
+                            onClick={useBtnNavigation('/signup')}
+                            className="bg-deep-blue text-white px-6 py-2 hover:bg-navy-blue transition w-full md:w-auto">
+                            Sign Up
+                        </button>
                         <button
                             className="bg-gray-800 text-white px-6 py-2 hover:bg-dark-gray transition w-full md:w-auto"
                             onClick={() => setIsOpen(true)}>
