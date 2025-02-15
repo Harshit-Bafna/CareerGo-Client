@@ -8,6 +8,7 @@ import config from "../../data/config"
 
 const serverURL = config.SERVER_URL
 const authURL = 'api/v1/auth'
+const institutionURL = 'api/v1/institution'
 
 const initialState = {
     isLoggedIn: false,
@@ -29,11 +30,36 @@ export const registerUser = createAsyncThunk('auth/create', async (userPayload, 
 
         thunkAPI.dispatch(setSuccess(successMessage.userRegister))
 
-        const { token, code } = data.data.newUser.accountConfirmation;
+        return data
 
-        return { user: data.data.newUser, token, code };
+    } catch (error) {
+        const errorMessage =
+            axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
 
-        // return data
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
+    }
+})
+
+export const registerInstitution = createAsyncThunk('auth/createInstitution', async (Payload, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading())
+
+        const { data } = await axios.post(`${serverURL}/${institutionURL}/create`, Payload)
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        thunkAPI.dispatch(setSuccess(successMessage.institutionResgister))
+
+        return data
+
     } catch (error) {
         const errorMessage =
             axios.isAxiosError(error) && error.response?.data?.message
@@ -171,11 +197,6 @@ const authSlice = createSlice({
             .addCase(userLogin.rejected, (state) => {
                 state.isLoggedIn = false
             })
-            .addCase(registerUser.fulfilled, (state, action) => {
-                state.data = action.payload.user;
-                state.token = action.payload.token;
-                state.code = action.payload.code;
-            });
     },
 })
 

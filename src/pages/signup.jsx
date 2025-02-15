@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { setError } from '../store/slices/errorSlice'
 import { registerUser } from '../store/slices/authSlice'
-import { validateEmail, validatePassword } from '../utils/helper/syncHelper'
+import { useBtnNavigation, validateEmail, validatePassword } from '../utils/helper/syncHelper'
 import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -21,7 +21,7 @@ const Signup = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [conscent, setConscent] = useState(false)
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
         if (!name) {
@@ -70,12 +70,12 @@ const Signup = () => {
         const response = await dispatch(registerUser(payload))
 
         if (response.meta.requestStatus === 'fulfilled') {
-            navigate('/sentEmail', { state: { SentEmailMessage: 'Check your email to verify the account...' } })
+            navigate('/sentEmail', { state: { SentEmailMessage: 'to verify the email' } })
         }
     }
 
     return (
-        <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-0">
+        <section className="flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-3">
             <div className="hidden md:block md:w-1/3 ">
                 <img
                     className="h-96"
@@ -203,13 +203,25 @@ const Signup = () => {
                         <button className="w-full bg-deep-blue text-white py-2 rounded-lg hover:bg-navy-blue transition">Sign Up</button>
                     </div>
                 </form>
-                <div className="mt-4 font-semibold text-sm text-slate-500 text-center md:text-left">
+                <div className="mt-1 font-semibold text-sm text-slate-500 text-center md:text-left">
                     Already have an account?{' '}
                     <NavLink
                         className="text-deep-blue hover:underline hover:underline-offset-4"
                         to="/signin">
                         Sign in
                     </NavLink>
+                </div>
+                <div className="flex justify-center items-center font-inter my-5 text-dark-gray">
+                    <hr className="w-8 border-dark-gray mr-2" />
+                    or as an institution
+                    <hr className="w-8 border-dark-gray ml-2" />
+                </div>
+                <div className="text-center md:text-left mb-3">
+                    <button
+                        onClick={useBtnNavigation('/signupInstitution')}
+                        className="w-full border border-deep-blue text-deep-blue py-2 rounded-lg hover:bg-deep-blue hover:text-white transition">
+                        Sign Up as an institution
+                    </button>
                 </div>
             </div>
         </section>
