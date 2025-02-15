@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { setError } from '../store/slices/errorSlice'
+import { forgetPassword } from '../store/slices/authSlice'
 import { useDispatch } from 'react-redux'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { validateEmail } from '../utils/helper/syncHelper'
 import logo from '../assets/logo.png'
 import forgotPasswordImg from '../assets/forgotPassword.svg'
-import { NavLink } from 'react-router-dom'
 
 const ForgotPassword = () => {
     const dispatch = useDispatch()
+    const navigate = useNavigate()
 
     const [email, setEmail] = useState('')
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault()
 
         if (!email) {
@@ -22,6 +24,16 @@ const ForgotPassword = () => {
             const errorMessage = 'Invalid email format.'
             dispatch(setError(errorMessage))
             return
+        }
+
+        const payload = {
+            emailAddress: email,
+        }
+
+        const response = await dispatch(forgetPassword(payload))
+
+        if (response.meta.requestStatus === 'fulfilled') {
+            navigate('/sentEmail', { state: { SentEmailMessage: 'to reset your password' } })
         }
     }
 
@@ -62,13 +74,17 @@ const ForgotPassword = () => {
                         placeholder="Email Address"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg"
                     />
 
                     <button className="mt-4 w-full bg-deep-blue text-white py-2 rounded-lg hover:bg-navy-blue transition">Continue</button>
 
                     <div className="mt-4 text-center">
-                        <NavLink to="/signin" className="text-dark-gray font-medium hover:underline">&lt; Back to Login</NavLink>
+                        <NavLink
+                            to="/signin"
+                            className="text-dark-gray font-medium hover:underline">
+                            &lt; Back to Login
+                        </NavLink>
                     </div>
                 </form>
             </div>
