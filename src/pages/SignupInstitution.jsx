@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { setError } from '../store/slices/errorSlice'
 import { registerInstitution } from '../store/slices/authSlice'
+import { uploadToAWS } from '../store/slices/awsSlice'
 import { validateEmail, validatePassword, useBtnNavigation } from '../utils/helper/syncHelper'
 import signin_img from '../assets/signupInstitution.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
+import { LuLoaderCircle } from 'react-icons/lu'
 import { FaArrowRight } from 'react-icons/fa'
 import { NavLink, useNavigate } from 'react-router-dom'
 
@@ -17,6 +19,7 @@ const SignupInstitution = () => {
     const [institutionName, setInstitutionName] = useState('')
     const [registrationNumber, setRegistrationNumber] = useState('')
     const [institutionLogo, setInstitutionLogo] = useState('')
+    const [logoLoading, setLogoLoading] = useState(false)
     const [websiteUrl, setWebsiteUrl] = useState('')
     const [adminName, setAdminName] = useState('')
     const [adminEmail, setAdminEmail] = useState('')
@@ -32,6 +35,25 @@ const SignupInstitution = () => {
             return
         }
         setStep(2)
+    }
+
+    const handleLogoUpload = async (e) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('fileName', file.name)
+            formData.append('folderName', 'Institution_logo')
+
+            const awsPayload = {
+                fileDetails: formData,
+                setLoading: setLogoLoading,
+            }
+
+            const response = await dispatch(uploadToAWS(awsPayload))
+
+            setInstitutionLogo(response.data.key)
+        }
     }
 
     const handleSubmit = async (e) => {
@@ -154,19 +176,26 @@ const SignupInstitution = () => {
                                 />
                             </div>
 
-                            <div>
+                            <div className="relative">
                                 <label
                                     htmlFor="logo"
                                     className="block mb-2 text-sm font-medium text-gray-900">
                                     Logo
                                 </label>
-                                <input
-                                    className="text-sm w-full px-4 py-2 border border-solid bg-gray-50 border-gray-300 rounded"
-                                    type="file"
-                                    placeholder="Logo"
-                                    value={institutionLogo}
-                                    onChange={(e) => setInstitutionLogo(e.target.value)}
-                                />
+                                <div className="relative w-full">
+                                    <input
+                                        className="text-sm w-full px-4 py-2 border border-solid bg-gray-50 border-gray-300 rounded pr-10"
+                                        type="file"
+                                        placeholder="Logo"
+                                        onChange={handleLogoUpload}
+                                    />
+                                    {logoLoading && (
+                                        <LuLoaderCircle
+                                            className="absolute top-3 right-3 animate-spin text-gray-500 "
+                                            size={20}
+                                        />
+                                    )}
+                                </div>
                             </div>
 
                             <div>
