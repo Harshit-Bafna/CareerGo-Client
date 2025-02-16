@@ -181,6 +181,33 @@ export const verifyEmail = createAsyncThunk('auth/confirmation', async (Payload,
     }
 });
 
+export const ResendVerifyEmailLink = createAsyncThunk('auth/confirmation', async ({emailAddress}, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading());
+
+        const { data } = await axios.put(`${serverURL}/${authURL}/resend/email-verification?emailAddress=${emailAddress}`, {}, { withCredentials: true })
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        thunkAPI.dispatch(setSuccess(successMessage.userResendVerificationEmail))
+
+        return data;
+    } catch (error) {
+        const errorMessage =
+            axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
+    }
+});
+
 const authSlice = createSlice({
     name: 'auth',
     initialState,

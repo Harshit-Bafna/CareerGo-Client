@@ -13,7 +13,7 @@ const ForgotPassword = () => {
 
     const [email, setEmail] = useState('')
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
         if (!email) {
@@ -33,7 +33,7 @@ const ForgotPassword = () => {
         const response = await dispatch(forgetPassword(payload))
 
         if (response.meta.requestStatus === 'fulfilled') {
-            navigate('/sentEmail', { state: { SentEmailMessage: 'to reset your password' } })
+            navigate('/sentEmail', { state: { SentEmailMessage: 'to reset your password', EmailAddress: email, IsForgotPassword: true } })
         }
     }
 
