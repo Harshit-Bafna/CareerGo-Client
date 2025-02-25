@@ -70,7 +70,7 @@ const Signup = () => {
         const response = await dispatch(registerUser(payload))
 
         if (response.meta.requestStatus === 'fulfilled') {
-            navigate('/sentEmail', { state: { SentEmailMessage: 'to verify the email' } })
+            navigate('/sentEmail', { state: { SentEmailMessage: 'to verify the email', EmailAddress: email, IsEmailVerify: true } })
         }
     }
 

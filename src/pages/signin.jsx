@@ -41,7 +41,7 @@ const Signin = () => {
         const response = await dispatch(userLogin(payload))
 
         if (response.meta.requestStatus === 'fulfilled') {
-            navigate('/')
+            navigate('/dashboard')
         }
     }
 
