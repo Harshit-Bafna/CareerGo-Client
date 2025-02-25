@@ -1,5 +1,6 @@
 import { createBrowserRouter, createRoutesFromElements } from 'react-router-dom'
 import RootLayout from './Layouts/RootLayout'
+import AuthenticatedRootLayout from './Layouts/AuthenticatedRootLayout'
 import { Route } from 'react-router-dom'
 import Home from './pages/Home'
 import About from './pages/About'
@@ -12,6 +13,12 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import SentEmail from './pages/SentEmail'
 import EmailVerification from './pages/EmailVerification'
+import Dashboard from './pagesAuthenticated/Dashboard'
+import UserProfile from './pagesAuthenticated/Profile/UserProfile'
+import ChangePassword from './pagesAuthenticated/Profile/ChangePassword'
+import Education from './pagesAuthenticated/Profile/Education'
+import CertificationAndCourses from './pagesAuthenticated/Profile/CertificationAndCourses'
+import Achievements from './pagesAuthenticated/Profile/Achievements'
 
 export const Router = createBrowserRouter(
     createRoutesFromElements(
@@ -34,7 +41,7 @@ export const Router = createBrowserRouter(
             />
             <Route
                 path="/sentEmail"
-                element={<SentEmail/>}
+                element={<SentEmail />}
             />
             <Route
                 path="/resetPassword/:token"
@@ -63,6 +70,36 @@ export const Router = createBrowserRouter(
                 <Route
                     path="*"
                     element={<PageNotFound />}
+                />
+            </Route>
+
+            <Route
+                path="/dashboard"
+                element={<AuthenticatedRootLayout />}>
+                <Route
+                    index
+                    element={<Dashboard />}
+                />
+                <Route
+                    path="userProfile"
+                    element={<UserProfile />}
+                >
+                    <Route
+                        path="certificationAndCourses"
+                        element={<CertificationAndCourses />}
+                    />
+                    <Route
+                        path="education"
+                        element={<Education />}
+                    />
+                    <Route
+                        path="achievements"
+                        element={<Achievements />}
+                    />
+                </Route>
+                <Route
+                    path="changePassword"
+                    element={<ChangePassword />}
                 />
             </Route>
         </>

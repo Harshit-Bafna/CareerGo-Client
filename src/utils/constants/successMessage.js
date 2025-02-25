@@ -8,4 +8,5 @@ export default {
     userUpdatePassword: 'Password updated successfully',
     userVerifyEmail: 'Email verified successfully',
     userResendVerificationEmail: 'Verification email sent successfully',
+    userChangePassword: 'Password changes successfully'
 }
