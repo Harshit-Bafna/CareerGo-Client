@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
-import { useDispatch } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { verifyEmail } from '../store/slices/authSlice'
 import { setError } from '../store/slices/errorSlice'
 
@@ -10,6 +10,16 @@ const EmailVerification = () => {
     const code = searchParams.get('code')
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const { isLoggedIn } = useSelector((state) => state.auth)
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/dashboard')
+        }
+
+        return null
+    }, [isLoggedIn, navigate])
 
     useEffect(() => {
         const verifyUserEmail = async () => {

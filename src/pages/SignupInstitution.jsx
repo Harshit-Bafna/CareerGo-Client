@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { setError } from '../store/slices/errorSlice'
 import { registerInstitution } from '../store/slices/authSlice'
 import { uploadToAWS } from '../store/slices/awsSlice'
-import { validateEmail, validatePassword, useBtnNavigation } from '../utils/helper/syncHelper'
+import { validateEmail, validatePassword } from '../utils/helper/syncHelper'
 import signin_img from '../assets/signupInstitution.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -14,6 +14,15 @@ import { NavLink, useNavigate } from 'react-router-dom'
 const SignupInstitution = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const { isLoggedIn } = useSelector((state) => state.auth)
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/dashboard')
+        }
+
+    }, [isLoggedIn, navigate])
 
     const [step, setStep] = useState(1)
     const [institutionName, setInstitutionName] = useState('')
@@ -123,6 +132,8 @@ const SignupInstitution = () => {
             navigate('/sentEmail', { state: { SentEmailMessage: 'to verify the email' } })
         }
     }
+
+    if (isLoggedIn) return null
 
     return (
         <section className="flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-3">
@@ -350,7 +361,7 @@ const SignupInstitution = () => {
                 </div>
                 <div className="text-center md:text-left mb-3">
                     <button
-                        onClick={useBtnNavigation('/signup')}
+                        onClick={() => navigate('/signup')}
                         className="w-full border border-deep-blue text-deep-blue py-2 rounded-lg hover:bg-deep-blue hover:text-white transition">
                         Sign Up as an individual
                     </button>

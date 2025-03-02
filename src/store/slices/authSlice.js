@@ -98,7 +98,34 @@ export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thu
     } finally {
         thunkAPI.dispatch(stopLoading())
     }
-});
+})
+
+export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading())
+
+        const { data } = await axios.put(`${serverURL}/${authURL}/logout`, { withCredentials: true });
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        thunkAPI.dispatch(setSuccess(successMessage.userLogout))
+
+        return data;
+    } catch (error) {
+        const errorMessage =
+            axios.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
+    }
+})
 
 export const forgetPassword = createAsyncThunk('auth/forgotPassword', async (Payload, thunkAPI) => {
     try {
@@ -181,7 +208,7 @@ export const verifyEmail = createAsyncThunk('auth/confirmation', async (Payload,
     }
 });
 
-export const ResendVerifyEmailLink = createAsyncThunk('auth/confirmation', async ({emailAddress}, thunkAPI) => {
+export const ResendVerifyEmailLink = createAsyncThunk('auth/confirmation', async ({ emailAddress }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading());
 
@@ -250,6 +277,10 @@ const authSlice = createSlice({
             })
             .addCase(userLogin.rejected, (state) => {
                 state.isLoggedIn = false
+            })
+            .addCase(userLogout.fulfilled, (state) => {
+                state.isLoggedIn = false
+                state.data = null
             })
     },
 })

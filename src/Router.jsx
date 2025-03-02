@@ -19,6 +19,10 @@ import ChangePassword from './pagesAuthenticated/Profile/ChangePassword'
 import Education from './pagesAuthenticated/Profile/Education'
 import CertificationAndCourses from './pagesAuthenticated/Profile/CertificationAndCourses'
 import Achievements from './pagesAuthenticated/Profile/Achievements'
+import Recommendations from './pagesAuthenticated/Recommendations'
+import BookCounselling from './pagesAuthenticated/Counselling/BookCounselling'
+import ViewCounselling from './pagesAuthenticated/Counselling/ViewCounselling'
+import Logout from './pagesAuthenticated/Logout'
 
 export const Router = createBrowserRouter(
     createRoutesFromElements(
@@ -82,8 +86,7 @@ export const Router = createBrowserRouter(
                 />
                 <Route
                     path="userProfile"
-                    element={<UserProfile />}
-                >
+                    element={<UserProfile />}>
                     <Route
                         path="certificationAndCourses"
                         element={<CertificationAndCourses />}
@@ -101,7 +104,23 @@ export const Router = createBrowserRouter(
                     path="changePassword"
                     element={<ChangePassword />}
                 />
+                <Route
+                    path="recommendations"
+                    element={<Recommendations />}
+                />
+                <Route
+                    path="bookCounselling"
+                    element={<BookCounselling />}
+                />
+                <Route
+                    path="counselling"
+                    element={<ViewCounselling />}
+                />
             </Route>
+            <Route
+                path="/logout"
+                element={<Logout />}
+            />
         </>
     )
 )

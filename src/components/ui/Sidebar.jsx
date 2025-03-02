@@ -8,6 +8,7 @@ import { NavLink } from 'react-router-dom'
 
 export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     const [isProfileOpen, setIsProfileOpen] = useState(false)
+    const [isCounsellingOpen, setIsCounsellingOpen] = useState(false)
 
     return (
         <div
@@ -20,32 +21,84 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                 />
 
                 <nav className="mt-5 space-y-2">
-                    <SidebarItem to="/dashboard" icon={<FaHome />} text="Dashboard" isSidebarOpen={isSidebarOpen} />
-                    
-                    <div 
+                    <SidebarItem
+                        to="/dashboard"
+                        icon={<FaHome />}
+                        text="Dashboard"
+                        isSidebarOpen={isSidebarOpen}
+                    />
+
+                    <div
                         className="relative group"
                         onMouseEnter={() => setIsProfileOpen(true)}
-                        onMouseLeave={() => setIsProfileOpen(false)}
-                    >
-                        <button 
+                        onMouseLeave={() => setIsProfileOpen(false)}>
+                        <button
                             className="flex items-center p-3 w-full rounded cursor-pointer transition-all duration-200 hover:bg-gray-700"
-                            onClick={() => setIsProfileOpen(!isProfileOpen)}
-                        >
+                            onClick={() => setIsProfileOpen(!isProfileOpen)}>
                             <FaUser />
                             <span className={`ml-3 transition-all duration-300 ${isSidebarOpen ? 'block' : 'hidden'}`}>User Profile</span>
                             <IoIosArrowDown className={`ml-auto transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
                         </button>
                         {isProfileOpen && (
                             <div className="ml-10 space-y-1 transition-all duration-300">
-                                <SidebarItem to="/dashboard/userProfile" icon={<FaUser />} text="Profile" isSidebarOpen={isSidebarOpen} />
-                                <SidebarItem to="/dashboard/changePassword" icon={<FaLock />} text="Change Password" isSidebarOpen={isSidebarOpen} />
+                                <SidebarItem
+                                    to="/dashboard/userProfile"
+                                    icon={<FaUser />}
+                                    text="Profile"
+                                    isSidebarOpen={isSidebarOpen}
+                                />
+                                <SidebarItem
+                                    to="/dashboard/changePassword"
+                                    icon={<FaLock />}
+                                    text="Change Password"
+                                    isSidebarOpen={isSidebarOpen}
+                                />
                             </div>
                         )}
                     </div>
 
-                    <SidebarItem to="/recommendations" icon={<FaLightbulb />} text="Recommendations" isSidebarOpen={isSidebarOpen} />
-                    <SidebarItem to="/counselling" icon={<FaBookOpen />} text="Counselling" isSidebarOpen={isSidebarOpen} />
-                    <SidebarItem to="/logout" icon={<FaSignOutAlt />} text="Logout" isSidebarOpen={isSidebarOpen} />
+                    <SidebarItem
+                        to="/dashboard/recommendations"
+                        icon={<FaLightbulb />}
+                        text="Recommendations"
+                        isSidebarOpen={isSidebarOpen}
+                    />
+
+                    <div
+                        className="relative group"
+                        onMouseEnter={() => setIsCounsellingOpen(true)}
+                        onMouseLeave={() => setIsCounsellingOpen(false)}>
+                        <button
+                            className="flex items-center p-3 w-full rounded cursor-pointer transition-all duration-200 hover:bg-gray-700"
+                            onClick={() => setIsCounsellingOpen(!isCounsellingOpen)}>
+                            <FaBookOpen />
+                            <span className={`ml-3 transition-all duration-300 ${isSidebarOpen ? 'block' : 'hidden'}`}>Counselling</span>
+                            <IoIosArrowDown className={`ml-auto transition-transform duration-200 ${isCounsellingOpen ? 'rotate-180' : ''}`} />
+                        </button>
+                        {isCounsellingOpen && (
+                            <div className="ml-10 space-y-1 transition-all duration-300">
+                                <SidebarItem
+                                    to="/dashboard/bookCounselling"
+                                    icon={<FaBookOpen />}
+                                    text="Book Counselling"
+                                    isSidebarOpen={isSidebarOpen}
+                                />
+                                <SidebarItem
+                                    to="/dashboard/counselling"
+                                    icon={<FaLock />}
+                                    text="View Counselling"
+                                    isSidebarOpen={isSidebarOpen}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    
+                    <SidebarItem
+                        to="/logout"
+                        icon={<FaSignOutAlt />}
+                        text="Logout"
+                        isSidebarOpen={isSidebarOpen}
+                    />
                 </nav>
             </div>
 
