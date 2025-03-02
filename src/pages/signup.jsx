@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { setError } from '../store/slices/errorSlice'
 import { registerUser } from '../store/slices/authSlice'
-import { useBtnNavigation, validateEmail, validatePassword } from '../utils/helper/syncHelper'
+import { validateEmail, validatePassword } from '../utils/helper/syncHelper'
 import signin_img from '../assets/signup.svg'
 import logo from '../assets/logo.png'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
@@ -12,6 +12,14 @@ import { NavLink, useNavigate } from 'react-router-dom'
 const Signup = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
+
+    const { isLoggedIn } = useSelector((state) => state.auth)
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/dashboard')
+        }
+    }, [isLoggedIn, navigate])
 
     const [name, setName] = useState('')
     const [email, setEmail] = useState('')
@@ -73,6 +81,8 @@ const Signup = () => {
             navigate('/sentEmail', { state: { SentEmailMessage: 'to verify the email', EmailAddress: email, IsEmailVerify: true } })
         }
     }
+
+    if (isLoggedIn) return null
 
     return (
         <section className="flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-3">
@@ -218,7 +228,7 @@ const Signup = () => {
                 </div>
                 <div className="text-center md:text-left mb-3">
                     <button
-                        onClick={useBtnNavigation('/signupInstitution')}
+                        onClick={() => navigate('/signupInstitution')}
                         className="w-full border border-deep-blue text-deep-blue py-2 rounded-lg hover:bg-deep-blue hover:text-white transition">
                         Sign Up as an institution
                     </button>

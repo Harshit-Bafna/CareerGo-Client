@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { setError } from '../store/slices/errorSlice'
 import { userLogin } from '../store/slices/authSlice'
 import { validateEmail } from '../utils/helper/syncHelper'
@@ -12,11 +12,19 @@ const Signin = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
 
+    const { isLoggedIn } = useSelector((state) => state.auth)
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            navigate('/dashboard')
+        }
+    }, [isLoggedIn, navigate])
+
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
         if (!email) {
@@ -44,6 +52,8 @@ const Signin = () => {
             navigate('/dashboard')
         }
     }
+
+    if (isLoggedIn) return null
 
     return (
         <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-0">

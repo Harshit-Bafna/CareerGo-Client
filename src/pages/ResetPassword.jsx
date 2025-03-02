@@ -11,14 +11,14 @@ import { NavLink, useParams, useNavigate } from 'react-router-dom'
 const ResetPassword = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const {token} = useParams()
+    const { token } = useParams()
 
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [confirmPassword, setConfirmPassword] = useState('')
     const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
         if (!password) {
@@ -48,7 +48,7 @@ const ResetPassword = () => {
         const response = await dispatch(resetPassword(Payload))
 
         if (response.meta.requestStatus === 'fulfilled') {
-            navigate('/signin')
+            navigate('/logout')
         }
     }
 
