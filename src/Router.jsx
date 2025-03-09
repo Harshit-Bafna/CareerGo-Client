@@ -23,6 +23,7 @@ import Recommendations from './pagesAuthenticated/Recommendations'
 import BookCounselling from './pagesAuthenticated/Counselling/BookCounselling'
 import ViewCounselling from './pagesAuthenticated/Counselling/ViewCounselling'
 import Logout from './pagesAuthenticated/Logout'
+import InstitutionProfile from './pagesAuthenticated/Institution Profile/InstitutionProfile'
 
 export const Router = createBrowserRouter(
     createRoutesFromElements(
@@ -100,6 +101,10 @@ export const Router = createBrowserRouter(
                         element={<Achievements />}
                     />
                 </Route>
+                <Route
+                    path="institutionProfile"
+                    element={<InstitutionProfile />}
+                />
                 <Route
                     path="changePassword"
                     element={<ChangePassword />}

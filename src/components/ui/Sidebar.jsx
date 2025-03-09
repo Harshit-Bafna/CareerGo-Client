@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { FaSignOutAlt, FaHome, FaBookOpen, FaUser, FaLightbulb, FaLock } from 'react-icons/fa'
 import { LuListCollapse } from 'react-icons/lu'
 import { IoIosArrowDown } from 'react-icons/io'
+import { BiSolidInstitution } from "react-icons/bi"
 import logoWhite from '../../assets/logo-white.png'
 import logoIconWhite from '../../assets/logoIcon-white.png'
 import { NavLink } from 'react-router-dom'
@@ -58,6 +59,13 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                     </div>
 
                     <SidebarItem
+                        to="/dashboard/institutionProfile"
+                        icon={<BiSolidInstitution />}
+                        text="Institution Profile"
+                        isSidebarOpen={isSidebarOpen}
+                    />
+
+                    <SidebarItem
                         to="/dashboard/recommendations"
                         icon={<FaLightbulb />}
                         text="Recommendations"
@@ -92,7 +100,7 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                             </div>
                         )}
                     </div>
-                    
+
                     <SidebarItem
                         to="/logout"
                         icon={<FaSignOutAlt />}
