@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { FaUser, FaCertificate, FaGraduationCap, FaTrophy } from 'react-icons/fa'
-import BasicInformation from './BasicInformation'
+import { FaUser, FaCertificate } from 'react-icons/fa'
+import { FaLink } from 'react-icons/fa6'
+import CoursesOffered from './CoursesOffered'
 
 const InputField = ({ name, value, onChange, className = '', disabled = false }) => {
     return (
@@ -16,44 +17,40 @@ const InputField = ({ name, value, onChange, className = '', disabled = false })
     )
 }
 
-const UserProfile = () => {
+const InstitutionProfile = () => {
     const location = useLocation()
     const [isEditing, setIsEditing] = useState(false)
-    const [userData, setUserData] = useState({
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+1 (555) 123-4567',
-        role: 'Student | CareerGo',
+    const [institutionData, setinstitutionData] = useState({
+        institutionName: 'Vellore Institute of Technology',
+        adminName: 'John Doe',
+        admissionStatus: 'Open',
     })
 
-    const [profileImage, setProfileImage] = useState(null)
+    const [institutionLogo, setinstitutionLogo] = useState(null)
     const [hover, setHover] = useState(false)
 
-    const tabs = [
-        { id: '', label: 'Basic Info', icon: FaUser, path: '' },
-        {
-            id: 'certificationAndCourses',
-            label: 'Certification And Courses',
-            icon: FaCertificate,
-            path: '/dashboard/userProfile/certificationAndCourses',
-        },
-        { id: 'education', label: 'Education', icon: FaGraduationCap, path: '/dashboard/userProfile/education' },
-        { id: 'achievements', label: 'Achievements', icon: FaTrophy, path: '/dashboard/userProfile/achievements' },
-    ]
+    const tabs = [{ id: '', label: 'Courses Offered', icon: FaCertificate, path: '' }]
 
     const handleEdit = () => setIsEditing(true)
     const handleSave = () => setIsEditing(false)
-    const handleChange = (e) => setUserData({ ...userData, [e.target.name]: e.target.value })
+    const handleChange = (e) => setinstitutionData({ ...institutionData, [e.target.name]: e.target.value })
 
     const handleImageChange = (e) => {
         const file = e.target.files[0]
         if (file) {
             const reader = new FileReader()
             reader.onloadend = () => {
-                setProfileImage(reader.result)
+                setinstitutionLogo(reader.result)
             }
             reader.readAsDataURL(file)
         }
+    }
+
+    const updateAdmissionStatus = (status) => {
+        setinstitutionData((prevData) => ({
+            ...prevData,
+            admissionStatus: status,
+        }))
     }
 
     return (
@@ -66,9 +63,9 @@ const UserProfile = () => {
                                 className="relative flex items-center justify-center w-28 h-28 rounded-full border-4 border-blue-500 bg-gray-200 overflow-hidden cursor-pointer"
                                 onMouseEnter={() => setHover(true)}
                                 onMouseLeave={() => setHover(false)}>
-                                {profileImage ? (
+                                {institutionLogo ? (
                                     <img
-                                        src={profileImage}
+                                        src={institutionLogo}
                                         alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />
@@ -92,31 +89,64 @@ const UserProfile = () => {
                                 {isEditing ? (
                                     <div className="space-y-2">
                                         <InputField
-                                            name="name"
-                                            value={userData.name}
+                                            name="institutionName"
+                                            value={institutionData.institutionName}
                                             onChange={handleChange}
                                             disabled={true}
                                         />
                                         <InputField
-                                            name="email"
-                                            value={userData.email}
-                                            disabled={true}
+                                            name="adminName"
+                                            value={institutionData.adminName}
                                             onChange={handleChange}
                                         />
-                                        <InputField
-                                            name="phone"
-                                            value={userData.phone}
-                                            onChange={handleChange}
-                                        />
+                                        <div className="mt-2">
+                                            <label
+                                                htmlFor="admissionStatus"
+                                                className="block text-gray-700 font-medium">
+                                                Admission Status
+                                            </label>
+                                            <div
+                                                id="admissionStatus"
+                                                className="flex space-x-2 mt-1">
+                                                <button
+                                                    className={`px-3 py-1 rounded-md text-sm ${
+                                                        institutionData.admissionStatus === 'Open'
+                                                            ? 'bg-green-500 text-white'
+                                                            : 'bg-gray-200 text-gray-700'
+                                                    }`}
+                                                    onClick={() => updateAdmissionStatus('Open')}>
+                                                    Open
+                                                </button>
+                                                <button
+                                                    className={`px-3 py-1 rounded-md text-sm ${
+                                                        institutionData.admissionStatus === 'Closed'
+                                                            ? 'bg-red-500 text-white'
+                                                            : 'bg-gray-200 text-gray-700'
+                                                    }`}
+                                                    onClick={() => updateAdmissionStatus('Closed')}>
+                                                    Closed
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 ) : (
                                     <>
-                                        <h1 className="text-2xl font-bold text-gray-800">{userData.name}</h1>
-                                        <p className="text-gray-600">{userData.email}</p>
-                                        <p className="text-gray-600">{userData.phone}</p>
+                                        <h1 className="flex items-center text-2xl font-bold text-gray-800">
+                                            {institutionData.institutionName}
+                                            <a href="/">
+                                                <FaLink className="w-4 h-4 ml-2" />
+                                            </a>
+                                        </h1>
+
+                                        <p className="text-gray-600">{institutionData.adminName}</p>
+                                        <p
+                                            className={`rounded-md px-2 py-1 mt-2 text-sm inline-block ${
+                                                institutionData.admissionStatus === 'Open' ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+                                            }`}>
+                                            Admissions {institutionData.admissionStatus}
+                                        </p>
                                     </>
                                 )}
-                                <p className="text-gray-600 mt-2">{userData.role}</p>
                             </div>
                         </div>
                         <div className="mt-4 md:mt-0">
@@ -160,9 +190,11 @@ const UserProfile = () => {
                 </div>
             </nav>
 
-            <main className="container mx-auto px-4 py-8">{location.pathname === '/dashboard/userProfile' ? <BasicInformation /> : <Outlet />}</main>
+            <main className="container mx-auto px-4 py-8">
+                {location.pathname === '/dashboard/institutionProfile' ? <CoursesOffered /> : <Outlet />}
+            </main>
         </div>
     )
 }
 
-export default UserProfile
+export default InstitutionProfile
