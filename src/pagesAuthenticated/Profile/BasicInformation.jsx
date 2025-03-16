@@ -1,5 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaEdit, FaSave, FaGithub, FaLinkedin, FaTwitter, FaGlobe, FaTimes } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateBasicInfo, getBasicInfo } from '../../store/slices/userSlice'
+
+const LanguageExperties = {
+    Beginner: 'Beginner',
+    Intermediate: 'Intermediate',
+    Expert: 'Expert',
+}
+
+const SocialPlatform = {
+    Github: 'Github',
+    Linkedin: 'Linkedin',
+    Twitter: 'Twitter',
+    Website: 'Website',
+}
 
 const InputField = ({ label, type = 'text', name, value, options, onChange, required = false, disabled = false }) => {
     return (
@@ -11,10 +26,11 @@ const InputField = ({ label, type = 'text', name, value, options, onChange, requ
             {type === 'select' ? (
                 <select
                     name={name}
-                    value={value}
+                    value={value || ''}
                     onChange={onChange}
                     className="border p-2 w-full rounded-md"
                     required={required}>
+                    <option value="">Select {label}</option>
                     {options.map((option) => (
                         <option
                             key={option}
@@ -27,9 +43,9 @@ const InputField = ({ label, type = 'text', name, value, options, onChange, requ
                 <input
                     type={type}
                     name={name}
-                    value={value}
+                    value={value || ''}
                     onChange={onChange}
-                    className={`border p-2 w-full rounded-md  ${disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                    className={`border p-2 w-full rounded-md ${disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                     required={required}
                     disabled={disabled}
                 />
@@ -39,53 +55,144 @@ const InputField = ({ label, type = 'text', name, value, options, onChange, requ
 }
 
 const UserProfile = () => {
+    const dispatch = useDispatch()
+    const { name, emailAddress } = useSelector((state) => state.user)
+
     const [editSection, setEditSection] = useState(null)
     const [userData, setUserData] = useState({
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+1 (555) 123-4567',
-        dob: '2000-01-01',
-        gender: 'Male',
-        region: 'USA',
+        name: '',
+        email: '',
+        phone: '',
+        dateOfBirth: '',
+        gender: '',
+        region: '',
     })
-    const [languages, setLanguages] = useState([
-        { name: 'English', read: 'Expert', write: 'Intermediate' },
-        { name: 'Hindi', read: 'Intermediate', write: 'Beginner' },
-    ])
-    const [newLanguage, setNewLanguage] = useState({ name: '', read: 'Beginner', write: 'Beginner' })
-    const [skillsAndHobbies, setSkillsAndHobbies] = useState(['React', 'Tailwind CSS', 'JavaScript'])
+
+    const [languages, setLanguages] = useState([])
+    const [newLanguage, setNewLanguage] = useState({
+        name: '',
+        read: LanguageExperties.Beginner,
+        write: LanguageExperties.Beginner,
+    })
+
+    const [skillsAndHobbies, setSkillsAndHobbies] = useState([])
     const [newSkillOrHobby, setNewSkillOrHobby] = useState('')
+
     const [socialLinks, setSocialLinks] = useState({
-        github: 'https://github.com/johndoe',
-        linkedin: 'https://linkedin.com/in/johndoe',
-        twitter: 'https://twitter.com/johndoe',
-        website: 'https://johndoe.com',
+        [SocialPlatform.Github]: '',
+        [SocialPlatform.Linkedin]: '',
+        [SocialPlatform.Twitter]: '',
+        [SocialPlatform.Website]: '',
     })
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await dispatch(getBasicInfo())
+
+            if (response.payload && response.payload.data) {
+                const { basicInfo } = response.payload.data
+
+                const formattedDate = basicInfo.dateOfBirth ? new Date(basicInfo.dateOfBirth).toISOString().split('T')[0] : ''
+
+                setUserData({
+                    name: name || '',
+                    email: emailAddress || '',
+                    phone: basicInfo.phone || '',
+                    dateOfBirth: formattedDate,
+                    gender: basicInfo.gender || '',
+                    region: basicInfo.region || '',
+                })
+
+                setLanguages(basicInfo.languages || [])
+
+                setSkillsAndHobbies(basicInfo.skills || [])
+
+                const socialLinksMap = {
+                    [SocialPlatform.Github]: '',
+                    [SocialPlatform.Linkedin]: '',
+                    [SocialPlatform.Twitter]: '',
+                    [SocialPlatform.Website]: '',
+                }
+
+                if (basicInfo.socialLinks && basicInfo.socialLinks.length > 0) {
+                    basicInfo.socialLinks.forEach((link) => {
+                        socialLinksMap[link.platform] = link.url
+                    })
+                }
+
+                setSocialLinks(socialLinksMap)
+            }
+        }
+
+        fetchData()
+    }, [dispatch, name, emailAddress])
 
     const handleChange = (e) => setUserData({ ...userData, [e.target.name]: e.target.value })
 
     const handleEdit = (section) => setEditSection(section)
 
     const handleSave = () => {
-        if (editSection === 'basic' && Object.values(userData).some((value) => !value)) {
-            alert('All fields in Basic Information are mandatory. Please fill them all.')
-            return
+        if (editSection === 'basic') {
+            const payload = {
+                phone: userData.phone,
+                dateOfBirth: userData.dateOfBirth,
+                gender: userData.gender,
+                region: userData.region,
+            }
+
+            dispatch(updateBasicInfo(payload))
+        } else if (editSection === 'languages') {
+            if (languages.length === 0) {
+                alert('At least one language is required.')
+                return
+            }
+
+            const payload = {
+                languages: languages.map((lang) => ({
+                    name: lang.name,
+                    read: lang.read,
+                    write: lang.write,
+                })),
+            }
+
+            dispatch(updateBasicInfo(payload))
+        } else if (editSection === 'skillsAndHobbies') {
+            if (skillsAndHobbies.length === 0) {
+                alert('At least one skill or hobby is required.')
+                return
+            }
+
+            const payload = {
+                skills: skillsAndHobbies,
+            }
+
+            dispatch(updateBasicInfo(payload))
+        } else if (editSection === 'social') {
+            const socialLinksArray = Object.entries(socialLinks)
+                .filter(([url]) => url.trim() !== '')
+                .map(([platform, url]) => ({
+                    platform,
+                    url,
+                }))
+
+            const payload = {
+                socialLinks: socialLinksArray,
+            }
+
+            dispatch(updateBasicInfo(payload))
         }
-        if (editSection === 'languages' && languages.length === 0) {
-            alert('At least one language is required.')
-            return
-        }
-        if (editSection === 'skillsAndHobbies' && skillsAndHobbies.length === 0) {
-            alert('At least one skill or hobby is required.')
-            return
-        }
+
         setEditSection(null)
     }
 
     const handleAddLanguage = () => {
         if (newLanguage.name.trim()) {
             setLanguages([...languages, newLanguage])
-            setNewLanguage({ name: '', read: 'Beginner', write: 'Beginner' })
+            setNewLanguage({
+                name: '',
+                read: LanguageExperties.Beginner,
+                write: LanguageExperties.Beginner,
+            })
         }
     }
 
@@ -102,6 +209,13 @@ const UserProfile = () => {
 
     const handleRemoveSkill = (skill) => {
         setSkillsAndHobbies(skillsAndHobbies.filter((s) => s !== skill))
+    }
+
+    const handleSocialLinkChange = (platform, value) => {
+        setSocialLinks({
+            ...socialLinks,
+            [platform]: value,
+        })
     }
 
     return (
@@ -128,8 +242,8 @@ const UserProfile = () => {
                         <div key={key}>
                             {editSection === 'basic' ? (
                                 <InputField
-                                    label={key.replace('dob', 'Date of Birth')}
-                                    type={key === 'dob' ? 'date' : key === 'gender' ? 'select' : 'text'}
+                                    label={key.replace('dateOfBirth', 'Date of Birth')}
+                                    type={key === 'dateOfBirth' ? 'date' : key === 'gender' ? 'select' : 'text'}
                                     name={key}
                                     value={userData[key]}
                                     options={key === 'gender' ? ['Male', 'Female', 'Other', "Don't want to say"] : []}
@@ -140,10 +254,10 @@ const UserProfile = () => {
                             ) : (
                                 <>
                                     <label className="block text-gray-600 font-medium capitalize">
-                                        {key.replace('dob', 'Date of Birth')}
+                                        {key.replace('dateOfBirth', 'Date of Birth')}
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <p className="text-gray-800">{userData[key]}</p>
+                                    <p className="text-gray-800">{userData[key] || 'Not provided'}</p>
                                 </>
                             )}
                         </div>
@@ -170,26 +284,30 @@ const UserProfile = () => {
                         </button>
                     )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {languages.map((lang, index) => (
-                        <div
-                            key={index}
-                            className="border p-4 rounded-md flex justify-between items-center">
-                            <div>
-                                <h3 className="font-semibold text-gray-700">{lang.name}</h3>
-                                <p className="text-gray-600">Read: {lang.read}</p>
-                                <p className="text-gray-600">Write: {lang.write}</p>
+                {languages.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {languages.map((lang, index) => (
+                            <div
+                                key={lang.name}
+                                className="border p-4 rounded-md flex justify-between items-center">
+                                <div>
+                                    <h3 className="font-semibold text-gray-700">{lang.name}</h3>
+                                    <p className="text-gray-600">Read: {lang.read}</p>
+                                    <p className="text-gray-600">Write: {lang.write}</p>
+                                </div>
+                                {editSection === 'languages' && (
+                                    <button
+                                        onClick={() => handleRemoveLanguage(index)}
+                                        className="text-red-500">
+                                        <FaTimes className="w-4 h-4" />
+                                    </button>
+                                )}
                             </div>
-                            {editSection === 'languages' && (
-                                <button
-                                    onClick={() => handleRemoveLanguage(index)}
-                                    className="text-red-500">
-                                    <FaTimes className="w-4 h-4" />
-                                </button>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-gray-600">No languages added yet.</p>
+                )}
                 {editSection === 'languages' && (
                     <div className="mt-4 space-y-2">
                         <input
@@ -202,19 +320,29 @@ const UserProfile = () => {
                         <div className="flex gap-2">
                             <select
                                 value={newLanguage.read}
-                                onChange={(e) => setNewLanguage({ ...newLanguage, read: e.target.value })}
+                                onChange={(e) =>
+                                    setNewLanguage({
+                                        ...newLanguage,
+                                        read: e.target.value,
+                                    })
+                                }
                                 className="border p-2 rounded-md w-1/2">
-                                <option value="Beginner">Read: Beginner</option>
-                                <option value="Intermediate">Read: Intermediate</option>
-                                <option value="Expert">Read: Expert</option>
+                                <option value={LanguageExperties.Beginner}>Read: Beginner</option>
+                                <option value={LanguageExperties.Intermediate}>Read: Intermediate</option>
+                                <option value={LanguageExperties.Expert}>Read: Expert</option>
                             </select>
                             <select
                                 value={newLanguage.write}
-                                onChange={(e) => setNewLanguage({ ...newLanguage, write: e.target.value })}
+                                onChange={(e) =>
+                                    setNewLanguage({
+                                        ...newLanguage,
+                                        write: e.target.value,
+                                    })
+                                }
                                 className="border p-2 rounded-md w-1/2">
-                                <option value="Beginner">Write: Beginner</option>
-                                <option value="Intermediate">Write: Intermediate</option>
-                                <option value="Expert">Write: Expert</option>
+                                <option value={LanguageExperties.Beginner}>Write: Beginner</option>
+                                <option value={LanguageExperties.Intermediate}>Write: Intermediate</option>
+                                <option value={LanguageExperties.Expert}>Write: Expert</option>
                             </select>
                         </div>
                         <button
@@ -245,22 +373,26 @@ const UserProfile = () => {
                         </button>
                     )}
                 </div>
-                <div className="flex flex-wrap gap-2">
-                    {skillsAndHobbies.map((skill) => (
-                        <span
-                            key={skill}
-                            className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center">
-                            {skill}
-                            {editSection === 'skillsAndHobbies' && (
-                                <button
-                                    onClick={() => handleRemoveSkill(skill)}
-                                    className="ml-2 text-red-500">
-                                    <FaTimes className="w-3 h-3" />
-                                </button>
-                            )}
-                        </span>
-                    ))}
-                </div>
+                {skillsAndHobbies.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                        {skillsAndHobbies.map((skill) => (
+                            <span
+                                key={skill}
+                                className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full flex items-center">
+                                {skill}
+                                {editSection === 'skillsAndHobbies' && (
+                                    <button
+                                        onClick={() => handleRemoveSkill(skill)}
+                                        className="ml-2 text-red-500">
+                                        <FaTimes className="w-3 h-3" />
+                                    </button>
+                                )}
+                            </span>
+                        ))}
+                    </div>
+                ) : (
+                    <p className="text-gray-600">No skills or hobbies added yet.</p>
+                )}
                 {editSection === 'skillsAndHobbies' && (
                     <div className="mt-4 flex">
                         <input
@@ -297,32 +429,94 @@ const UserProfile = () => {
                     )}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {Object.entries(socialLinks).map(([key, url]) => (
-                        <div
-                            key={key}
-                            className="flex items-center space-x-2">
-                            {key === 'github' && <FaGithub className="w-6 h-6 text-gray-600" />}
-                            {key === 'linkedin' && <FaLinkedin className="w-6 h-6 text-gray-600" />}
-                            {key === 'twitter' && <FaTwitter className="w-6 h-6 text-gray-600" />}
-                            {key === 'website' && <FaGlobe className="w-6 h-6 text-gray-600" />}
-                            {editSection === 'social' ? (
-                                <input
-                                    type="text"
-                                    value={url}
-                                    onChange={(e) => setSocialLinks({ ...socialLinks, [key]: e.target.value })}
-                                    className="border p-2 w-full rounded-md"
-                                />
-                            ) : (
-                                <a
-                                    href={url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-blue-500 hover:underline">
-                                    {url}
-                                </a>
-                            )}
-                        </div>
-                    ))}
+                    <div className="flex items-center space-x-2">
+                        <FaGithub className="w-6 h-6 text-gray-600" />
+                        {editSection === 'social' ? (
+                            <input
+                                type="text"
+                                value={socialLinks[SocialPlatform.Github]}
+                                onChange={(e) => handleSocialLinkChange(SocialPlatform.Github, e.target.value)}
+                                className="border p-2 w-full rounded-md"
+                                placeholder="https://github.com/username"
+                            />
+                        ) : socialLinks[SocialPlatform.Github] ? (
+                            <a
+                                href={socialLinks[SocialPlatform.Github]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline">
+                                {socialLinks[SocialPlatform.Github]}
+                            </a>
+                        ) : (
+                            <span className="text-gray-500">Not provided</span>
+                        )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <FaLinkedin className="w-6 h-6 text-gray-600" />
+                        {editSection === 'social' ? (
+                            <input
+                                type="text"
+                                value={socialLinks[SocialPlatform.Linkedin]}
+                                onChange={(e) => handleSocialLinkChange(SocialPlatform.Linkedin, e.target.value)}
+                                className="border p-2 w-full rounded-md"
+                                placeholder="https://linkedin.com/in/username"
+                            />
+                        ) : socialLinks[SocialPlatform.Linkedin] ? (
+                            <a
+                                href={socialLinks[SocialPlatform.Linkedin]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline">
+                                {socialLinks[SocialPlatform.Linkedin]}
+                            </a>
+                        ) : (
+                            <span className="text-gray-500">Not provided</span>
+                        )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <FaTwitter className="w-6 h-6 text-gray-600" />
+                        {editSection === 'social' ? (
+                            <input
+                                type="text"
+                                value={socialLinks[SocialPlatform.Twitter]}
+                                onChange={(e) => handleSocialLinkChange(SocialPlatform.Twitter, e.target.value)}
+                                className="border p-2 w-full rounded-md"
+                                placeholder="https://twitter.com/username"
+                            />
+                        ) : socialLinks[SocialPlatform.Twitter] ? (
+                            <a
+                                href={socialLinks[SocialPlatform.Twitter]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline">
+                                {socialLinks[SocialPlatform.Twitter]}
+                            </a>
+                        ) : (
+                            <span className="text-gray-500">Not provided</span>
+                        )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <FaGlobe className="w-6 h-6 text-gray-600" />
+                        {editSection === 'social' ? (
+                            <input
+                                type="text"
+                                value={socialLinks[SocialPlatform.Website]}
+                                onChange={(e) => handleSocialLinkChange(SocialPlatform.Website, e.target.value)}
+                                className="border p-2 w-full rounded-md"
+                                placeholder="https://yourwebsite.com"
+                            />
+                        ) : socialLinks[SocialPlatform.Website] ? (
+                            <a
+                                href={socialLinks[SocialPlatform.Website]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline">
+                                {socialLinks[SocialPlatform.Website]}
+                            </a>
+                        ) : (
+                            <span className="text-gray-500">Not provided</span>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

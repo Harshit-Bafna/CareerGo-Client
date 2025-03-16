@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { FaEdit, FaSave, FaPlus, FaTrash } from 'react-icons/fa'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { createAchievement, deleteAchievement, getAchievements, updateAchievement } from '../../store/slices/userSlice'
 const Input = ({ label, name, value, onChange, placeholder, type = 'text', required = true }) => (
     <div className="flex flex-col mb-2">
         <label className="mb-1 text-sm font-medium text-gray-700">
@@ -62,29 +63,14 @@ const Select = ({ label, name, value, onChange, options, required = true }) => (
 )
 
 const Achievements = () => {
+    const dispatch = useDispatch()
+    const { loading, error } = useSelector((state) => state.user || {})
+
     const [isEditing, setIsEditing] = useState(false)
-    const [achievements, setAchievements] = useState([
-        {
-            id: 1,
-            title: 'Hackathon Winner',
-            category: 'Academic',
-            organization: 'XYZ University',
-            date: '2023-05-15',
-            description: 'Won first place in a national-level hackathon.',
-        },
-        {
-            id: 2,
-            title: 'Best Employee Award',
-            category: 'Professional',
-            organization: 'ABC Corp',
-            date: '2022-11-30',
-            description: 'Recognized for outstanding performance and dedication at work.',
-        },
-    ])
+    const [achievements, setAchievements] = useState([])
     const categories = ['Academic', 'Professional', 'Extracurricular', 'Sports', 'Arts']
 
     const [newAchievement, setNewAchievement] = useState({
-        id: 0,
         title: '',
         category: '',
         organization: '',
@@ -92,23 +78,86 @@ const Achievements = () => {
         description: '',
     })
 
-    const toggleEdit = () => setIsEditing(!isEditing)
+    useEffect(() => {
+        fetchAchievements()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
+
+    const fetchAchievements = async () => {
+        const resultAction = await dispatch(getAchievements())
+        if (getAchievements.fulfilled.match(resultAction)) {
+            const mappedAchievements = resultAction.payload.data.achievements.map((ach) => ({
+                id: ach._id,
+                title: ach.title,
+                category: ach.type,
+                organization: ach.awardedBy,
+                date: ach.startDate,
+                description: ach.description || '',
+            }))
+            setAchievements(mappedAchievements)
+        }
+    }
+
+    const toggleEdit = async () => {
+        if (isEditing) {
+            await fetchAchievements()
+        }
+        setIsEditing(!isEditing)
+    }
 
     const handleChange = (e, id) => {
         const { name, value } = e.target
         setAchievements((prev) => prev.map((ach) => (ach.id === id ? { ...ach, [name]: value } : ach)))
     }
 
-    const handleAddAchievement = (e) => {
+    const handleAddAchievement = async (e) => {
         e.preventDefault()
-        if (newAchievement.title && newAchievement.category && newAchievement.organization && newAchievement.date && newAchievement.description) {
-            setAchievements([...achievements, { ...newAchievement, id: Date.now() }])
-            setNewAchievement({ id: 0, title: '', category: '', organization: '', date: '', description: '' })
+        if (newAchievement.title && newAchievement.category && newAchievement.organization && newAchievement.date) {
+            const payload = {
+                title: newAchievement.title,
+                type: newAchievement.category,
+                awardedBy: newAchievement.organization,
+                startDate: newAchievement.date,
+                description: newAchievement.description,
+            }
+
+            const resultAction = await dispatch(createAchievement(payload))
+            if (createAchievement.fulfilled.match(resultAction)) {
+                await fetchAchievements()
+                setNewAchievement({ title: '', category: '', organization: '', date: '', description: '' })
+            }
         }
     }
 
-    const handleRemoveAchievement = (id) => {
-        setAchievements((prev) => prev.filter((ach) => ach.id !== id))
+    const handleUpdateAchievement = async (id) => {
+        const achievement = achievements.find((ach) => ach.id === id)
+        if (!achievement) return
+
+        const payload = {
+            achievementId: id,
+            title: achievement.title,
+            type: achievement.category,
+            awardedBy: achievement.organization,
+            startDate: achievement.date,
+            description: achievement.description,
+        }
+
+        await dispatch(updateAchievement(payload))
+    }
+
+    const handleRemoveAchievement = async (id) => {
+        const payload = { achievementId: id }
+        const resultAction = await dispatch(deleteAchievement(payload))
+        if (deleteAchievement.fulfilled.match(resultAction)) {
+            setAchievements((prev) => prev.filter((ach) => ach.id !== id))
+        }
+    }
+
+    const handleSaveAll = async () => {
+        for (const achievement of achievements) {
+            await handleUpdateAchievement(achievement.id)
+        }
+        toggleEdit()
     }
 
     return (
@@ -116,12 +165,17 @@ const Achievements = () => {
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Achievements</h2>
                 <button
-                    onClick={toggleEdit}
-                    className="flex items-center text-blue-600 hover:text-blue-800 transition">
+                    onClick={isEditing ? handleSaveAll : toggleEdit}
+                    className="flex items-center text-blue-600 hover:text-blue-800 transition"
+                    disabled={loading}>
                     {isEditing ? <FaSave className="w-4 h-4 mr-2" /> : <FaEdit className="w-4 h-4 mr-2" />}
                     {isEditing ? 'Save' : 'Edit'}
                 </button>
             </div>
+
+            {error && <div className="text-red-500 mb-4">{error}</div>}
+            {loading && <div className="text-blue-500 mb-4">Loading...</div>}
+
             <div className="space-y-6">
                 {achievements.map((ach) => (
                     <div
@@ -168,7 +222,8 @@ const Achievements = () => {
                                 />
                                 <button
                                     onClick={() => handleRemoveAchievement(ach.id)}
-                                    className="text-red-500 hover:text-red-600">
+                                    className="text-red-500 hover:text-red-600"
+                                    disabled={loading}>
                                     <FaTrash className="w-4 h-4" />
                                 </button>
                             </div>
@@ -185,6 +240,7 @@ const Achievements = () => {
                     </div>
                 ))}
             </div>
+
             {isEditing && (
                 <div className="mt-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Achievement</h3>
@@ -229,7 +285,8 @@ const Achievements = () => {
                         />
                         <button
                             type="submit"
-                            className="flex items-center text-blue-600 hover:text-blue-800 transition">
+                            className="flex items-center text-blue-600 hover:text-blue-800 transition"
+                            disabled={loading}>
                             <FaPlus className="w-4 h-4 mr-2" /> Add Achievement
                         </button>
                     </form>
