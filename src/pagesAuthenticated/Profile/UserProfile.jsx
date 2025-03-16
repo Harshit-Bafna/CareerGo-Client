@@ -1,32 +1,31 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { FaUser, FaCertificate, FaGraduationCap, FaTrophy } from 'react-icons/fa'
+import { LuLoaderCircle } from 'react-icons/lu'
 import BasicInformation from './BasicInformation'
-
-const InputField = ({ name, value, onChange, className = '', disabled = false }) => {
-    return (
-        <input
-            type="text"
-            name={name}
-            value={value}
-            onChange={onChange}
-            disabled={disabled}
-            className={`border border-gray-300 rounded-md p-2 w-full ${disabled ? 'bg-gray-200 cursor-not-allowed' : ''} ${className}`}
-        />
-    )
-}
+import { useDispatch, useSelector } from 'react-redux'
+import { uploadToAWS } from '../../store/slices/awsSlice'
+import { updateProfileImage } from '../../store/slices/userSlice'
 
 const UserProfile = () => {
     const location = useLocation()
-    const [isEditing, setIsEditing] = useState(false)
+    const dispatch = useDispatch()
+
+    const { name, emailAddress, profileImage } = useSelector((state) => state.user)
+
     const [userData, setUserData] = useState({
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        phone: '+1 (555) 123-4567',
-        role: 'Student | CareerGo',
+        name: '',
+        email: '',
     })
 
-    const [profileImage, setProfileImage] = useState(null)
+    const [profileLoading, setProfileLoading] = useState(false)
+
+    useEffect(() => {
+        if (name && emailAddress) {
+            setUserData({ name, email: emailAddress })
+        }
+    }, [name, emailAddress])
+
     const [hover, setHover] = useState(false)
 
     const tabs = [
@@ -41,18 +40,23 @@ const UserProfile = () => {
         { id: 'achievements', label: 'Achievements', icon: FaTrophy, path: '/dashboard/userProfile/achievements' },
     ]
 
-    const handleEdit = () => setIsEditing(true)
-    const handleSave = () => setIsEditing(false)
-    const handleChange = (e) => setUserData({ ...userData, [e.target.name]: e.target.value })
-
-    const handleImageChange = (e) => {
-        const file = e.target.files[0]
+    const handleImageChange = async (e) => {
+        const file = e.target.files?.[0]
         if (file) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                setProfileImage(reader.result)
+            const formData = new FormData()
+            formData.append('file', file)
+            formData.append('fileName', `${name}_profileImage_${Date.now()}`)
+            formData.append('folderName', 'profileImages')
+
+            const payload = {
+                fileDetails: formData,
+                setLoading: setProfileLoading,
             }
-            reader.readAsDataURL(file)
+
+            const response = await dispatch(uploadToAWS(payload)).unwrap()
+
+            dispatch(updateProfileImage({ profileImage: response.data.fileUrl }))
+
         }
     }
 
@@ -81,58 +85,26 @@ const UserProfile = () => {
                                     }`}>
                                     Click to Upload
                                 </div>
+                                {profileLoading && (
+                                    <div
+                                        className={`absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center text-white text-sm transition-opacity ${
+                                            hover ? 'opacity-100' : 'opacity-0'
+                                        }`}>
+                                        <LuLoaderCircle className="text-white" />
+                                    </div>
+                                )}
                                 <input
-                                    type="file"
                                     accept="image/*"
+                                    type="file"
+                                    placeholder="Logo"
                                     onChange={handleImageChange}
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                 />
                             </div>
                             <div className="text-center md:text-left ml-4">
-                                {isEditing ? (
-                                    <div className="space-y-2">
-                                        <InputField
-                                            name="name"
-                                            value={userData.name}
-                                            onChange={handleChange}
-                                            disabled={true}
-                                        />
-                                        <InputField
-                                            name="email"
-                                            value={userData.email}
-                                            disabled={true}
-                                            onChange={handleChange}
-                                        />
-                                        <InputField
-                                            name="phone"
-                                            value={userData.phone}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                ) : (
-                                    <>
-                                        <h1 className="text-2xl font-bold text-gray-800">{userData.name}</h1>
-                                        <p className="text-gray-600">{userData.email}</p>
-                                        <p className="text-gray-600">{userData.phone}</p>
-                                    </>
-                                )}
-                                <p className="text-gray-600 mt-2">{userData.role}</p>
+                                <h1 className="text-2xl font-bold text-gray-800">{userData.name}</h1>
+                                <p className="text-gray-600">{userData.email}</p>
                             </div>
-                        </div>
-                        <div className="mt-4 md:mt-0">
-                            {isEditing ? (
-                                <button
-                                    onClick={handleSave}
-                                    className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors">
-                                    Save
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleEdit}
-                                    className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors">
-                                    Edit
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>

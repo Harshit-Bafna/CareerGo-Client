@@ -12,9 +12,10 @@ import {
     FaPlus,
     FaTimes,
     FaCheck,
+    FaAward,
 } from 'react-icons/fa'
 import { IoMdTime } from 'react-icons/io'
-import { Md10K, MdOutlineCastForEducation, MdOutlineAttachMoney, MdCloudUpload } from 'react-icons/md'
+import { MdOutlineCastForEducation, MdOutlineAttachMoney, MdCloudUpload } from 'react-icons/md'
 import { BsBook, BsCalendarCheck, BsExclamationTriangle } from 'react-icons/bs'
 import { HiOutlineAcademicCap } from 'react-icons/hi'
 
@@ -531,7 +532,7 @@ const CoursesOffered = () => {
                                             <span>Duration: {course.duration}</span>
                                         </div>
                                         <div className="flex items-center text-sm">
-                                            <Md10K className="mr-2 text-deep-blue" />
+                                            <FaAward className="mr-2 text-deep-blue" />
                                             <span>Eligibility: {course.eligibility}</span>
                                         </div>
                                         <div className="flex items-center text-sm">
@@ -605,7 +606,7 @@ const CoursesOffered = () => {
 
                                 <div className="bg-background-light p-4 rounded-lg">
                                     <h4 className="font-heading font-semibold text-navy-blue mb-2 flex items-center">
-                                        <Md10K className="mr-2" /> Eligibility
+                                        <FaAward className="mr-2" /> Eligibility
                                     </h4>
                                     <p>{selectedCourse.eligibility}</p>
                                 </div>

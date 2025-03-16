@@ -1,15 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { FaEdit, FaSave, FaPlus, FaTrash, FaChevronDown, FaChevronUp } from 'react-icons/fa'
+import { getEducation, createEducation, updateEducation, deleteEducation } from '../../store/slices/userSlice'
+
+const EEducationCategory = {
+    Below_10th: '10th and below',
+    Above_10th_And_Below_12th: '11th & 12th',
+    Graduation_And_Above: 'Graduation and above',
+}
+
+const EGradeType = {
+    CGPA: 'CGPA',
+    PERCENTAGE: 'Percentage',
+}
 
 const Input = ({ label, name, value, onChange, placeholder, type = 'text', required = true }) => (
     <div className="mb-2">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label
+            htmlFor="gradeType"
+            className="block text-sm font-medium text-gray-700 mb-1">
             {label} {required && <span className="text-red-500">*</span>}
         </label>
         <input
             type={type}
             name={name}
-            value={value}
+            value={value || ''}
             onChange={onChange}
             placeholder={placeholder}
             className="w-full p-2 border rounded-md"
@@ -19,45 +34,94 @@ const Input = ({ label, name, value, onChange, placeholder, type = 'text', requi
 )
 
 const Education = () => {
+    const dispatch = useDispatch()
     const [isEditing, setIsEditing] = useState(false)
-    const [educations, setEducations] = useState([
-        {
-            id: 1,
-            institution: 'VIT Bhopal',
-            category: 'Graduation and above',
-            fields: {
-                course: 'B.Tech in CSE',
-                major: 'Computer Science',
-                specialization: '',
-                startDate: '2020-09',
-                endDate: '2024-05',
-                grade: '8.72 CGPA',
-                projects: '',
-            },
+    const [educations, setEducations] = useState([])
+    const [newEducation, setNewEducation] = useState({
+        institution: '',
+        category: '',
+        fields: {
+            gradeType: EGradeType.PERCENTAGE,
+            gradeValue: '',
+            startDate: '',
+            endDate: '',
         },
-        {
-            id: 2,
-            institution: 'XYZ School',
-            category: '11th & 12th',
-            fields: {
-                standard: '11th',
-                board: 'CBSE',
-                year: '2020',
-                stream: 'Science',
-                grade: '92%',
-            },
-        },
-    ])
-    const [newEducation, setNewEducation] = useState({ institution: '', category: '', fields: {} })
+    })
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
     const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [isGradeDropdownOpen, setIsGradeDropdownOpen] = useState(false)
+    const [editingEducation, setEditingEducation] = useState(null)
 
-    const toggleEdit = () => setIsEditing(!isEditing)
+    const loading = useSelector((state) => state.user?.loading) || isLoading
+    const apiError = useSelector((state) => state.user?.error)
+
+    useEffect(() => {
+        fetchEducation()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch])
+
+    const fetchEducation = async () => {
+        setIsLoading(true)
+        try {
+            const result = await dispatch(getEducation()).unwrap()
+            if (result.success) {
+                const formattedEducation = result.data.education.map((edu) => ({
+                    id: edu._id,
+                    institution: edu.institutionName,
+                    category: edu.category,
+                    fields: {
+                        standard: edu.standard || '',
+                        board: edu.board || '',
+                        mediumOfInstruction: edu.mediumOfInstruction || '',
+                        stream: edu.stream || '',
+                        major: edu.major || '',
+                        specialization: edu.specialization || '',
+                        startDate: edu.startDate ? edu.startDate.substring(0, 7) : '',
+                        endDate: edu.endDate ? edu.endDate.substring(0, 7) : '',
+                        gradeType: edu.grade.type,
+                        gradeValue: edu.grade.value,
+                    },
+                }))
+
+                setEducations(formattedEducation)
+            }
+        } catch (err) {
+            setError(err.message || 'Failed to fetch education data')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const formatGradeForDisplay = (gradeType, gradeValue) => {
+        if (gradeType === EGradeType.CGPA) {
+            return `${gradeValue} CGPA`
+        } else {
+            return `${gradeValue}%`
+        }
+    }
+
+    const toggleEdit = () => {
+        setIsEditing(!isEditing)
+        setEditingEducation(null)
+    }
+
     const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen)
+    const toggleGradeDropdown = () => setIsGradeDropdownOpen(!isGradeDropdownOpen)
 
     const handleCategoryChange = (e) => {
         const category = e.target.value
-        setNewEducation({ ...newEducation, category, fields: {} })
+        setNewEducation({
+            ...newEducation,
+            category,
+            fields: {
+                ...newEducation.fields,
+                gradeType: EGradeType.PERCENTAGE,
+                gradeValue: '',
+                startDate: '',
+                endDate: '',
+            },
+        })
         setError('')
     }
 
@@ -70,182 +134,382 @@ const Education = () => {
         setError('')
     }
 
-    const validateFields = () => {
-        const { category, institution, fields } = newEducation
-        if (!category || !institution) return false
-
-        const requiredFields = {
-            '10th and below': ['standard', 'board', 'year', 'grade'],
-            '11th & 12th': ['standard', 'board', 'year', 'stream', 'grade'],
-            'Graduation and above': ['course', 'major', 'startDate', 'endDate', 'grade'],
-        }
-
-        return requiredFields[category].every((field) => fields[field] && fields[field].trim() !== '')
+    const handleGradeTypeChange = (type) => {
+        setNewEducation((prev) => ({
+            ...prev,
+            fields: { ...prev.fields, gradeType: type },
+        }))
+        setIsGradeDropdownOpen(false)
     }
 
-    const handleAddEducation = () => {
-        if (validateFields()) {
-            setEducations([...educations, { ...newEducation, id: Date.now() }])
-            setNewEducation({ institution: '', category: '', fields: {} })
-            setIsDropdownOpen(false)
-            setError('')
-        } else {
-            setError('Please fill in all mandatory fields.')
+    const validateFields = (education) => {
+        const { category, institution, fields } = education
+
+        if (!category || !institution) {
+            setError('Institution name and category are required')
+            return false
+        }
+
+        if (!fields.gradeType || !fields.gradeValue) {
+            setError('Grade type and value are required')
+            return false
+        }
+
+        if (!fields.startDate) {
+            setError('Start date is required')
+            return false
+        }
+
+        if (category === EEducationCategory.Below_10th || category === EEducationCategory.Above_10th_And_Below_12th) {
+            if (!fields.standard) {
+                setError('Standard is required')
+                return false
+            }
+            if (!fields.board) {
+                setError('Board is required')
+                return false
+            }
+        }
+
+        if (category === EEducationCategory.Graduation_And_Above) {
+            if (!fields.stream) {
+                setError('Stream/Course is required')
+                return false
+            }
+            if (!fields.major) {
+                setError('Major is required')
+                return false
+            }
+        }
+
+        return true
+    }
+
+    const prepareEducationPayload = (education) => {
+        const { institution, category, fields } = education
+
+        const payload = {
+            institutionName: institution,
+            category: category,
+            grade: {
+                type: fields.gradeType,
+                value: Number(fields.gradeValue),
+            },
+            startDate: fields.startDate ? `${fields.startDate}-01` : '',
+            endDate: fields.endDate ? `${fields.endDate}-01` : null,
+        }
+
+        if (category === EEducationCategory.Below_10th || category === EEducationCategory.Above_10th_And_Below_12th) {
+            payload.standard = fields.standard || null
+            payload.board = fields.board || null
+            payload.mediumOfInstruction = fields.mediumOfInstruction || null
+        }
+
+        if (category === EEducationCategory.Graduation_And_Above) {
+            payload.stream = fields.stream || null
+            payload.major = fields.major || null
+            payload.specialization = fields.specialization || null
+        }
+
+        return payload
+    }
+
+    const handleAddEducation = async () => {
+        if (validateFields(newEducation)) {
+            try {
+                const payload = prepareEducationPayload(newEducation)
+                const result = await dispatch(createEducation(payload)).unwrap()
+
+                if (result.success) {
+                    await fetchEducation()
+                    setNewEducation({
+                        institution: '',
+                        category: '',
+                        fields: {
+                            gradeType: EGradeType.PERCENTAGE,
+                            gradeValue: '',
+                            startDate: '',
+                            endDate: '',
+                        },
+                    })
+                    setIsDropdownOpen(false)
+                    setError('')
+                }
+            } catch (err) {
+                setError(err.message || 'Failed to add education')
+            }
         }
     }
 
-    const handleRemoveEducation = (id) => {
-        if (isEditing) {
-            setEducations((prev) => prev.filter((edu) => edu.id !== id))
+    const startEditEducation = (education) => {
+        setEditingEducation(education.id)
+        setNewEducation({
+            id: education.id,
+            institution: education.institution,
+            category: education.category,
+            fields: { ...education.fields },
+        })
+    }
+
+    const cancelEditEducation = () => {
+        setEditingEducation(null)
+        setNewEducation({
+            institution: '',
+            category: '',
+            fields: {
+                gradeType: EGradeType.PERCENTAGE,
+                gradeValue: '',
+                startDate: '',
+                endDate: '',
+            },
+        })
+    }
+
+    const handleUpdateEducation = async () => {
+        if (validateFields(newEducation)) {
+            try {
+                const payload = {
+                    ...prepareEducationPayload(newEducation),
+                    educationId: newEducation.id,
+                }
+
+                const result = await dispatch(updateEducation(payload)).unwrap()
+
+                if (result.success) {
+                    await fetchEducation()
+                    setEditingEducation(null)
+                    setNewEducation({
+                        institution: '',
+                        category: '',
+                        fields: {
+                            gradeType: EGradeType.PERCENTAGE,
+                            gradeValue: '',
+                            startDate: '',
+                            endDate: '',
+                        },
+                    })
+                }
+            } catch (err) {
+                setError(err.message || 'Failed to update education')
+            }
         }
     }
 
-    const renderFields = () => {
-        switch (newEducation.category) {
-            case '10th and below':
-                return (
-                    <>
-                        <Input
-                            label="Standard"
-                            name="standard"
-                            value={newEducation.fields.standard || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Standard"
-                        />
-                        <Input
-                            label="Board/University"
-                            name="board"
-                            value={newEducation.fields.board || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Board/University"
-                        />
-                        <Input
-                            label="Year of Passing"
-                            name="year"
-                            type="number"
-                            value={newEducation.fields.year || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Year of Passing"
-                        />
-                        <Input
-                            label="Percentage/Grade"
-                            name="grade"
-                            value={newEducation.fields.grade || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Percentage/Grade"
-                        />
-                        <Input
-                            label="Medium of Instruction"
-                            name="medium"
-                            value={newEducation.fields.medium || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Medium of Instruction"
-                            required={false}
-                        />
-                    </>
-                )
-            case '11th & 12th':
-                return (
-                    <>
-                        <Input
-                            label="Standard"
-                            name="standard"
-                            value={newEducation.fields.standard || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Standard"
-                        />
-                        <Input
-                            label="Board/University"
-                            name="board"
-                            value={newEducation.fields.board || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Board/University"
-                        />
-                        <Input
-                            label="Year of Passing"
-                            name="year"
-                            type="number"
-                            value={newEducation.fields.year || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Year of Passing"
-                        />
-                        <Input
-                            label="Stream/Group"
-                            name="stream"
-                            value={newEducation.fields.stream || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Stream/Group"
-                        />
-                        <Input
-                            label="Percentage/Grade/CGPA"
-                            name="grade"
-                            value={newEducation.fields.grade || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Percentage/Grade/CGPA"
-                        />
-                    </>
-                )
-            case 'Graduation and above':
-                return (
-                    <>
-                        <Input
-                            label="Course/Degree"
-                            name="course"
-                            value={newEducation.fields.course || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Course/Degree"
-                        />
-                        <Input
-                            label="Major/Field of Study"
-                            name="major"
-                            value={newEducation.fields.major || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Major/Field of Study"
-                        />
-                        <Input
-                            label="Specialization"
-                            name="specialization"
-                            value={newEducation.fields.specialization || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Specialization"
-                            required={false}
-                        />
-                        <Input
-                            label="Start Date"
-                            name="startDate"
-                            type="month"
-                            value={newEducation.fields.startDate || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Start Date"
-                        />
-                        <Input
-                            label="End Date"
-                            name="endDate"
-                            type="month"
-                            value={newEducation.fields.endDate || ''}
-                            onChange={handleFieldChange}
-                            placeholder="End Date"
-                        />
-                        <Input
-                            label="Percentage/Grade/CGPA"
-                            name="grade"
-                            value={newEducation.fields.grade || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Percentage/Grade/CGPA"
-                        />
-                        <Input
-                            label="Relevant Projects/Internships"
-                            name="projects"
-                            value={newEducation.fields.projects || ''}
-                            onChange={handleFieldChange}
-                            placeholder="Relevant Projects/Internships"
-                            required={false}
-                        />
-                    </>
-                )
-            default:
-                return null
+    const handleRemoveEducation = async (id) => {
+        if (window.confirm('Are you sure you want to delete this education?')) {
+            try {
+                await dispatch(deleteEducation({ educationId: id })).unwrap()
+                await fetchEducation()
+            } catch (err) {
+                setError(err.message || 'Failed to delete education')
+            }
         }
+    }
+
+    const renderEducationForm = (education, isNew = true) => {
+        const { category, fields } = education
+
+        const commonFields = (
+            <>
+                <Input
+                    label="Institution Name"
+                    name="institution"
+                    value={education.institution}
+                    onChange={(e) => {
+                        if (isNew) {
+                            setNewEducation({ ...education, institution: e.target.value })
+                        } else {
+                            setNewEducation({ ...education, institution: e.target.value })
+                        }
+                    }}
+                    placeholder="Institution Name"
+                />
+
+                {isNew && (
+                    <div className="mb-2">
+                        <label
+                            htmlFor="category"
+                            className="block text-sm font-medium text-gray-700 mb-1">
+                            Category <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <button
+                                id="category"
+                                onClick={toggleDropdown}
+                                className="w-full p-2 border rounded-md text-left flex justify-between items-center">
+                                {education.category || 'Select Category'}
+                                {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                            </button>
+                            {isDropdownOpen && (
+                                <div className="absolute z-10 w-full bg-white border rounded-md mt-1">
+                                    {Object.values(EEducationCategory).map((cat) => (
+                                        <button
+                                            key={cat}
+                                            className="w-full p-2 text-left hover:bg-gray-100"
+                                            onClick={() => {
+                                                handleCategoryChange({ target: { value: cat } })
+                                                setIsDropdownOpen(false)
+                                            }}>
+                                            {cat}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                <div className="mb-2">
+                    <label
+                        htmlFor="gradeType"
+                        className="block text-sm font-medium text-gray-700 mb-1">
+                        Grade Type <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                        <button
+                            onClick={toggleGradeDropdown}
+                            className="w-full p-2 border rounded-md text-left flex justify-between items-center">
+                            {fields.gradeType || EGradeType.PERCENTAGE}
+                            {isGradeDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
+                        </button>
+                        {isGradeDropdownOpen && (
+                            <div className="absolute z-10 w-full bg-white border rounded-md mt-1">
+                                {Object.values(EGradeType).map((type) => (
+                                    <button
+                                        key={type}
+                                        className="w-full p-2 text-left hover:bg-gray-100"
+                                        onClick={() => handleGradeTypeChange(type)}>
+                                        {type}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <Input
+                    label="Grade Value"
+                    name="gradeValue"
+                    type="number"
+                    value={fields.gradeValue}
+                    onChange={handleFieldChange}
+                    placeholder={fields.gradeType === EGradeType.CGPA ? 'Enter CGPA (e.g., 9.5)' : 'Enter Percentage (e.g., 95)'}
+                />
+
+                <Input
+                    label="Start Date"
+                    name="startDate"
+                    type="month"
+                    value={fields.startDate}
+                    onChange={handleFieldChange}
+                    placeholder="Start Date"
+                />
+
+                <Input
+                    label="End Date"
+                    name="endDate"
+                    type="month"
+                    value={fields.endDate}
+                    onChange={handleFieldChange}
+                    placeholder="End Date"
+                    required={false}
+                />
+            </>
+        )
+
+        let categoryFields = null
+
+        if (category === EEducationCategory.Below_10th || category === EEducationCategory.Above_10th_And_Below_12th) {
+            categoryFields = (
+                <>
+                    <Input
+                        label="Standard"
+                        name="standard"
+                        value={fields.standard}
+                        onChange={handleFieldChange}
+                        placeholder="Standard"
+                    />
+
+                    <Input
+                        label="Board"
+                        name="board"
+                        value={fields.board}
+                        onChange={handleFieldChange}
+                        placeholder="Board/University"
+                    />
+
+                    <Input
+                        label="Medium of Instruction"
+                        name="mediumOfInstruction"
+                        value={fields.mediumOfInstruction}
+                        onChange={handleFieldChange}
+                        placeholder="Medium of Instruction"
+                        required={false}
+                    />
+                </>
+            )
+        } else if (category === EEducationCategory.Graduation_And_Above) {
+            categoryFields = (
+                <>
+                    <Input
+                        label="Stream/Course"
+                        name="stream"
+                        value={fields.stream}
+                        onChange={handleFieldChange}
+                        placeholder="Stream/Course"
+                    />
+
+                    <Input
+                        label="Major"
+                        name="major"
+                        value={fields.major}
+                        onChange={handleFieldChange}
+                        placeholder="Major/Field of Study"
+                    />
+
+                    <Input
+                        label="Specialization"
+                        name="specialization"
+                        value={fields.specialization}
+                        onChange={handleFieldChange}
+                        placeholder="Specialization"
+                        required={false}
+                    />
+                </>
+            )
+        }
+
+        return (
+            <div className="space-y-4">
+                {commonFields}
+                {category && categoryFields}
+
+                {isNew ? (
+                    <button
+                        onClick={handleAddEducation}
+                        className="flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        <FaPlus className="w-4 h-4 mr-2" /> Add Education
+                    </button>
+                ) : (
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={handleUpdateEducation}
+                            className="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                            <FaSave className="w-4 h-4 mr-2" /> Save Changes
+                        </button>
+                        <button
+                            onClick={cancelEditEducation}
+                            className="flex items-center bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+                            Cancel
+                        </button>
+                    </div>
+                )}
+            </div>
+        )
+    }
+
+    if (loading && educations.length === 0) {
+        return <div className="bg-white rounded-xl shadow-lg p-6">Loading education data...</div>
     }
 
     return (
@@ -256,84 +520,80 @@ const Education = () => {
                     onClick={toggleEdit}
                     className="flex items-center text-blue-600 hover:text-blue-800 transition">
                     {isEditing ? <FaSave className="w-4 h-4 mr-2" /> : <FaEdit className="w-4 h-4 mr-2" />}
-                    {isEditing ? 'Save' : 'Edit'}
+                    {isEditing ? 'Done' : 'Edit'}
                 </button>
             </div>
-            {isEditing && (
-                <div className="mt-6">
+
+            {(error || apiError) && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error || apiError}</div>}
+
+            {isEditing && !editingEducation && (
+                <div className="mt-6 border-t pt-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Education</h3>
-                    <Input
-                        label="Institution Name"
-                        name="institution"
-                        value={newEducation.institution}
-                        onChange={(e) => setNewEducation({ ...newEducation, institution: e.target.value })}
-                        placeholder="Institution Name"
-                    />
-                    <div className="mb-2">
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
-                            Category <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                            <button
-                                id="category"
-                                onClick={toggleDropdown}
-                                className="w-full p-2 border rounded-md text-left flex justify-between items-center">
-                                {newEducation.category || 'Select Category'}
-                                {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
-                            </button>
-                            {isDropdownOpen && (
-                                <div className="absolute z-10 w-full bg-white border rounded-md mt-1">
-                                    {['10th and below', '11th & 12th', 'Graduation and above'].map((category) => (
-                                        <button
-                                            key={category}
-                                            className="w-full p-2 text-left hover:bg-gray-100"
-                                            onClick={() => {
-                                                handleCategoryChange({ target: { value: category } })
-                                                setIsDropdownOpen(false)
-                                            }}>
-                                            {category}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    {renderFields()}
-                    {error && <p className="text-red-500 mt-2">{error}</p>}
-                    <button
-                        onClick={handleAddEducation}
-                        className="flex items-center text-blue-600 hover:text-blue-800 transition mt-4">
-                        <FaPlus className="w-4 h-4 mr-2" /> Add Education
-                    </button>
+                    {renderEducationForm(newEducation, true)}
                 </div>
             )}
+
             <div className="space-y-6 mt-6">
                 {educations.map((edu) => (
                     <div
                         key={edu.id}
-                        className="relative pl-6 border-l-2 border-gray-200">
+                        className="relative pl-6 border-l-2 border-gray-200 pb-4">
                         <div className="absolute -left-2 w-3 h-3 bg-blue-600 rounded-full" />
-                        <h3 className="text-lg font-semibold text-gray-800">{edu.institution}</h3>
-                        <p className="text-sm text-gray-500">{edu.category}</p>
-                        {Object.entries(edu.fields).map(
-                            ([key, value]) =>
-                                value && (
-                                    <p
-                                        key={key}
-                                        className="text-gray-600">
-                                        {key}: {value}
+
+                        {editingEducation === edu.id ? (
+                            <div className="mt-2">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Edit Education</h3>
+                                {renderEducationForm(newEducation, false)}
+                            </div>
+                        ) : (
+                            <>
+                                <h3 className="text-lg font-semibold text-gray-800">{edu.institution}</h3>
+                                <p className="text-sm text-gray-500">{edu.category}</p>
+
+                                {edu.category === EEducationCategory.Below_10th || edu.category === EEducationCategory.Above_10th_And_Below_12th ? (
+                                    <>
+                                        {edu.fields.standard && <p className="text-gray-600">Standard: {edu.fields.standard}</p>}
+                                        {edu.fields.board && <p className="text-gray-600">Board: {edu.fields.board}</p>}
+                                        {edu.fields.mediumOfInstruction && <p className="text-gray-600">Medium: {edu.fields.mediumOfInstruction}</p>}
+                                    </>
+                                ) : (
+                                    <>
+                                        {edu.fields.stream && <p className="text-gray-600">Stream/Course: {edu.fields.stream}</p>}
+                                        {edu.fields.major && <p className="text-gray-600">Major: {edu.fields.major}</p>}
+                                        {edu.fields.specialization && <p className="text-gray-600">Specialization: {edu.fields.specialization}</p>}
+                                    </>
+                                )}
+
+                                <p className="text-gray-600">Grade: {formatGradeForDisplay(edu.fields.gradeType, edu.fields.gradeValue)}</p>
+
+                                {edu.fields.startDate && (
+                                    <p className="text-gray-600">
+                                        Duration: {edu.fields.startDate} to {edu.fields.endDate || 'Present'}
                                     </p>
-                                )
-                        )}
-                        {isEditing && (
-                            <button
-                                onClick={() => handleRemoveEducation(edu.id)}
-                                className="text-red-500 hover:text-red-600 mt-2">
-                                <FaTrash className="w-4 h-4" />
-                            </button>
+                                )}
+
+                                {isEditing && (
+                                    <div className="mt-2 flex space-x-2">
+                                        <button
+                                            onClick={() => startEditEducation(edu)}
+                                            className="text-blue-500 hover:text-blue-600">
+                                            <FaEdit className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleRemoveEducation(edu.id)}
+                                            className="text-red-500 hover:text-red-600">
+                                            <FaTrash className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 ))}
+
+                {educations.length === 0 && !isEditing && (
+                    <div className="text-center py-6 text-gray-500">No education records found. Click Edit to add your education details.</div>
+                )}
             </div>
         </div>
     )

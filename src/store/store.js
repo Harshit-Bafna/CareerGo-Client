@@ -5,6 +5,7 @@ import successReducer from './slices/messageSlice'
 import loaderReducer from './slices/loaderSlice'
 import authReducer from './slices/authSlice'
 import awsReducer from './slices/awsSlice'
+import userReducer from './slices/userSlice'
 import storage from 'redux-persist/lib/storage'
 
 const persistConfig = {
@@ -19,6 +20,7 @@ const rootReducer = combineReducers({
     loader: loaderReducer,
     auth: authReducer,
     aws: awsReducer,
+    user: userReducer,
 })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)

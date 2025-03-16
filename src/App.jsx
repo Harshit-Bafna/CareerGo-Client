@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { clearError } from './store/slices/errorSlice'
 import { clearSuccess } from './store/slices/messageSlice'
+import { selfIdentification } from './store/slices/userSlice'
 import Message from './components/Message'
 import Loader from './components/Loader'
 import { Router } from './Router'
@@ -13,6 +14,10 @@ function App() {
     const { isSuccess, successMessage } = useSelector((state) => state.success)
     const { isLoading } = useSelector((state) => state.loader)
     const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(selfIdentification())
+    }, [dispatch])
 
     useEffect(() => {
         if (isError) {
