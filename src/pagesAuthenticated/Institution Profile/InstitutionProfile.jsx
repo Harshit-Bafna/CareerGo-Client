@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { FaUser, FaCertificate } from 'react-icons/fa'
-import { FaLink } from 'react-icons/fa6'
+import { FaUser, FaCertificate, FaLink } from 'react-icons/fa'
 import CoursesOffered from './CoursesOffered'
 
 const InputField = ({ name, value, onChange, className = '', disabled = false }) => {
@@ -20,34 +19,35 @@ const InputField = ({ name, value, onChange, className = '', disabled = false })
 const InstitutionProfile = () => {
     const location = useLocation()
     const [isEditing, setIsEditing] = useState(false)
-    const [institutionData, setinstitutionData] = useState({
+    const [institutionData, setInstitutionData] = useState({
         institutionName: 'Vellore Institute of Technology',
         adminName: 'John Doe',
         admissionStatus: 'Open',
+        website: 'https://www.vit.ac.in',
     })
 
-    const [institutionLogo, setinstitutionLogo] = useState(null)
+    const [institutionLogo, setInstitutionLogo] = useState(null)
     const [hover, setHover] = useState(false)
 
     const tabs = [{ id: '', label: 'Courses Offered', icon: FaCertificate, path: '' }]
 
     const handleEdit = () => setIsEditing(true)
     const handleSave = () => setIsEditing(false)
-    const handleChange = (e) => setinstitutionData({ ...institutionData, [e.target.name]: e.target.value })
+    const handleChange = (e) => setInstitutionData({ ...institutionData, [e.target.name]: e.target.value })
 
     const handleImageChange = (e) => {
         const file = e.target.files[0]
         if (file) {
             const reader = new FileReader()
             reader.onloadend = () => {
-                setinstitutionLogo(reader.result)
+                setInstitutionLogo(reader.result)
             }
             reader.readAsDataURL(file)
         }
     }
 
     const updateAdmissionStatus = (status) => {
-        setinstitutionData((prevData) => ({
+        setInstitutionData((prevData) => ({
             ...prevData,
             admissionStatus: status,
         }))
@@ -98,6 +98,12 @@ const InstitutionProfile = () => {
                                             name="adminName"
                                             value={institutionData.adminName}
                                             onChange={handleChange}
+                                            disabled={true}
+                                        />
+                                        <InputField
+                                            name="website"
+                                            value={institutionData.website}
+                                            onChange={handleChange}
                                         />
                                         <div className="mt-2">
                                             <label
@@ -133,11 +139,13 @@ const InstitutionProfile = () => {
                                     <>
                                         <h1 className="flex items-center text-2xl font-bold text-gray-800">
                                             {institutionData.institutionName}
-                                            <a href="/">
+                                            <a
+                                                href={institutionData.website}
+                                                target="_blank"
+                                                rel="noopener noreferrer">
                                                 <FaLink className="w-4 h-4 ml-2" />
                                             </a>
                                         </h1>
-
                                         <p className="text-gray-600">{institutionData.adminName}</p>
                                         <p
                                             className={`rounded-md px-2 py-1 mt-2 text-sm inline-block ${
