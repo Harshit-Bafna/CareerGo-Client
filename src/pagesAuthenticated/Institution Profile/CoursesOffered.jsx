@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { FaFilter, FaDownload, FaEnvelope, FaPhone, FaGlobe, FaEdit, FaTrash, FaPlus, FaTimes, FaCheck, FaAward } from 'react-icons/fa'
 import { IoMdTime } from 'react-icons/io'
 import { MdOutlineCastForEducation, MdOutlineAttachMoney, MdCloudUpload } from 'react-icons/md'
 import { BsBook, BsCalendarCheck, BsExclamationTriangle } from 'react-icons/bs'
 import { HiOutlineAcademicCap } from 'react-icons/hi'
+import { createCourseCategory, getCourseCategory, deleteCourseCategory } from '../../store/slices/institutionSlice'
 
 const initialCourseData = [
     {
@@ -160,8 +162,9 @@ const initialCourseData = [
 ]
 
 const CoursesOffered = () => {
+    const dispatch = useDispatch()
     const [courseData, setCourseData] = useState(initialCourseData)
-    const [categories, setCategories] = useState([...new Set(initialCourseData.map((course) => course.category))])
+    const [categories, setCategories] = useState([])
     const [selectedCategories, setSelectedCategories] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
     const [filteredCourses, setFilteredCourses] = useState(courseData)
@@ -177,6 +180,7 @@ const CoursesOffered = () => {
     const [newCategoryName, setNewCategoryName] = useState('')
     const [showDeleteCategoryConfirm, setShowDeleteCategoryConfirm] = useState(false)
     const [categoryToDelete, setCategoryToDelete] = useState(null)
+    const [categoryError, setCategoryError] = useState(null)
 
     const [formData, setFormData] = useState({
         id: null,
@@ -199,6 +203,23 @@ const CoursesOffered = () => {
     })
 
     const fileInputRef = useRef(null)
+
+    const { institutionId } = useSelector((state) => state.user)
+
+    useEffect(() => {
+        const fetchCourseCategories = async () => {
+            setCategoryError(null)
+
+            const response = await dispatch(getCourseCategory({ institutionId })).unwrap()
+
+            if (response.success && response.data.courseCategory) {
+                const fetchedCategories = response.data.courseCategory.courseCategory || []
+                setCategories(fetchedCategories)
+            }
+        }
+
+        fetchCourseCategories()
+    }, [dispatch, institutionId])
 
     useEffect(() => {
         let result = courseData
@@ -358,11 +379,30 @@ const CoursesOffered = () => {
         setShowCategoryForm(true)
     }
 
-    const handleCategoryFormSubmit = (e) => {
+    const handleCategoryFormSubmit = async (e) => {
         e.preventDefault()
+
         if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
-            // Add only the category without creating a new course
-            setCategories([...categories, newCategoryName.trim()])
+            setCategoryError(null)
+
+            const payload = {
+                courseCategory: newCategoryName.trim(),
+            }
+
+            await dispatch(
+                createCourseCategory({
+                    institutionId,
+                    Payload: payload,
+                })
+            ).unwrap()
+
+            const response = await dispatch(getCourseCategory({ institutionId })).unwrap()
+
+            if (response.success && response.data.courseCategory) {
+                const fetchedCategories = response.data.courseCategory.courseCategory || []
+                setCategories(fetchedCategories)
+            }
+
             setShowCategoryForm(false)
             setNewCategoryName('')
         }
@@ -381,16 +421,25 @@ const CoursesOffered = () => {
         setShowDeleteCategoryConfirm(true)
     }
 
-    const confirmDeleteCategory = () => {
-        // Remove the category
-        setCategories(categories.filter((cat) => cat !== categoryToDelete))
+    const confirmDeleteCategory = async () => {
+        setCategoryError(null)
 
-        // Remove all courses in that category
-        setCourseData(courseData.filter((course) => course.category !== categoryToDelete))
+        await dispatch(
+            deleteCourseCategory({
+                institutionId,
+                categoryName: categoryToDelete,
+            })
+        ).unwrap()
 
-        // Update selected categories if needed
-        if (selectedCategories.includes(categoryToDelete)) {
-            setSelectedCategories(selectedCategories.filter((cat) => cat !== categoryToDelete))
+        const response = await dispatch(getCourseCategory({ institutionId })).unwrap()
+
+        if (response.success && response.data.courseCategory) {
+            const fetchedCategories = response.data.courseCategory.courseCategory || []
+            setCategories(fetchedCategories)
+
+            if (selectedCategories.includes(categoryToDelete)) {
+                setSelectedCategories(selectedCategories.filter((cat) => cat !== categoryToDelete))
+            }
         }
 
         setShowDeleteCategoryConfirm(false)
@@ -403,7 +452,6 @@ const CoursesOffered = () => {
                 <h1 className="text-2xl md:text-3xl font-heading font-bold text-navy-blue">Courses Offered</h1>
             </div>
 
-            {/* Replace the course categories section with this updated version */}
             <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-xl md:text-2xl font-heading font-semibold text-deep-blue flex items-center">
@@ -415,6 +463,12 @@ const CoursesOffered = () => {
                         <FaPlus className="mr-2" /> Add new category
                     </button>
                 </div>
+
+                {categoryError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <p>{categoryError}</p>
+                    </div>
+                )}
 
                 <div className="bg-white rounded-lg shadow-md p-4 border border-border-light">
                     {categories.length > 0 ? (
@@ -624,6 +678,7 @@ const CoursesOffered = () => {
                                 <h4 className="font-heading font-semibold text-navy-blue mb-3 flex items-center">
                                     <MdOutlineAttachMoney className="mr-2" /> Fee Structure
                                 </h4>
+                                Fee Structure
                                 <p>{selectedCourse.fees}</p>
                             </div>
 
