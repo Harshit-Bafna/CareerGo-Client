@@ -5,6 +5,7 @@ import { setSuccess } from "./messageSlice"
 import successMessage from "../../utils/constants/successMessage"
 import axios from "axios"
 import config from "../../data/config"
+import { selfIdentification } from "./userSlice"
 
 const serverURL = config.SERVER_URL
 const authURL = 'api/v1/auth'
@@ -84,6 +85,7 @@ export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thu
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(selfIdentification())
         thunkAPI.dispatch(setSuccess(successMessage.userLogin))
 
         return data
