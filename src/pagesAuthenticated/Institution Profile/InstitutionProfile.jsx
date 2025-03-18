@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { FaUser, FaCertificate } from 'react-icons/fa'
-import { FaLink } from 'react-icons/fa6'
+import { FaUser, FaCertificate, FaLink } from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
 import CoursesOffered from './CoursesOffered'
+import { getInstitutionDetails, updateInstitutionDetails, updateInstitutionLogo } from '../../store/slices/institutionSlice'
+import { uploadToAWS } from '../../store/slices/awsSlice'
 
 const InputField = ({ name, value, onChange, className = '', disabled = false }) => {
     return (
@@ -19,35 +21,116 @@ const InputField = ({ name, value, onChange, className = '', disabled = false })
 
 const InstitutionProfile = () => {
     const location = useLocation()
+    const dispatch = useDispatch()
     const [isEditing, setIsEditing] = useState(false)
-    const [institutionData, setinstitutionData] = useState({
-        institutionName: 'Vellore Institute of Technology',
-        adminName: 'John Doe',
-        admissionStatus: 'Open',
+    const [institutionData, setInstitutionData] = useState({
+        institutionName: '',
+        adminName: '',
+        admissionStatus: false,
+        website: '',
     })
-
-    const [institutionLogo, setinstitutionLogo] = useState(null)
+    const [institutionLogo, setInstitutionLogo] = useState(null)
     const [hover, setHover] = useState(false)
+    const [profileLoading, setProfileLoading] = useState(false)
 
     const tabs = [{ id: '', label: 'Courses Offered', icon: FaCertificate, path: '' }]
 
-    const handleEdit = () => setIsEditing(true)
-    const handleSave = () => setIsEditing(false)
-    const handleChange = (e) => setinstitutionData({ ...institutionData, [e.target.name]: e.target.value })
+    const { institutionId } = useSelector((state) => state.user)
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0]
-        if (file) {
-            const reader = new FileReader()
-            reader.onloadend = () => {
-                setinstitutionLogo(reader.result)
+    useEffect(() => {
+        const fetchInstitutionDetails = async () => {
+            const response = await dispatch(getInstitutionDetails({ institutionId })).unwrap()
+
+            if (response.success) {
+                const { institution } = response.data
+                setInstitutionData({
+                    institutionName: institution.name,
+                    adminName: institution.adminName,
+                    admissionStatus: institution.admission ? 'Open' : 'Closed',
+                    website: institution.url || '',
+                })
+
+                if (institution.logo) {
+                    setInstitutionLogo(institution.logo)
+                }
             }
-            reader.readAsDataURL(file)
+        }
+
+        fetchInstitutionDetails()
+    }, [dispatch, institutionId])
+
+    const handleEdit = () => setIsEditing(true)
+
+    const handleSave = async () => {
+        const payload = {
+            website: institutionData.website,
+            admission: institutionData.admissionStatus === 'Open',
+        }
+
+        await dispatch(
+            updateInstitutionDetails({
+                institutionId,
+                Payload: payload,
+            })
+        ).unwrap()
+
+        const response = await dispatch(getInstitutionDetails({ institutionId })).unwrap()
+
+        if (response.success) {
+            const { institution } = response.data
+            setInstitutionData({
+                institutionName: institution.name,
+                adminName: institution.adminName,
+                admissionStatus: institution.admission ? 'Open' : 'Closed',
+                website: institution.url || '',
+            })
+        }
+
+        setIsEditing(false)
+    }
+
+    const handleChange = (e) => setInstitutionData({ ...institutionData, [e.target.name]: e.target.value })
+
+    const handleImageChange = async (e) => {
+        const file = e.target.files?.[0]
+        if (file) {
+            try {
+                setProfileLoading(true)
+
+                const formData = new FormData()
+                formData.append('file', file)
+                formData.append('fileName', `institution_logo_${Date.now()}`)
+                formData.append('folderName', 'institutionLogo')
+
+                const uploadResponse = await dispatch(
+                    uploadToAWS({
+                        fileDetails: formData,
+                        setLoading: setProfileLoading,
+                    })
+                ).unwrap()
+
+                if (uploadResponse.success) {
+                    const logoUrl = uploadResponse.data.fileUrl
+
+                    await dispatch(
+                        updateInstitutionLogo({
+                            institutionId,
+                            logo: logoUrl,
+                        })
+                    ).unwrap()
+
+                    setInstitutionLogo(logoUrl)
+
+                    await dispatch(getInstitutionDetails({ institutionId })).unwrap()
+                }
+            } finally {
+                setProfileLoading(false)
+            }
         }
     }
 
     const updateAdmissionStatus = (status) => {
-        setinstitutionData((prevData) => ({
+        setInstitutionData((prevData) => ({
             ...prevData,
             admissionStatus: status,
         }))
@@ -63,9 +146,13 @@ const InstitutionProfile = () => {
                                 className="relative flex items-center justify-center w-28 h-28 rounded-full border-4 border-blue-500 bg-gray-200 overflow-hidden cursor-pointer"
                                 onMouseEnter={() => setHover(true)}
                                 onMouseLeave={() => setHover(false)}>
-                                {institutionLogo ? (
+                                {profileLoading ? (
+                                    <div className="flex items-center justify-center">
+                                        <span className="text-sm">Uploading...</span>
+                                    </div>
+                                ) : institutionLogo ? (
                                     <img
-                                        src={institutionLogo}
+                                        src={institutionLogo || '/placeholder.svg'}
                                         alt="Profile"
                                         className="w-full h-full rounded-full object-cover"
                                     />
@@ -83,6 +170,7 @@ const InstitutionProfile = () => {
                                     accept="image/*"
                                     onChange={handleImageChange}
                                     className="absolute inset-0 opacity-0 cursor-pointer"
+                                    disabled={profileLoading}
                                 />
                             </div>
                             <div className="text-center md:text-left ml-4">
@@ -97,6 +185,12 @@ const InstitutionProfile = () => {
                                         <InputField
                                             name="adminName"
                                             value={institutionData.adminName}
+                                            onChange={handleChange}
+                                            disabled={true}
+                                        />
+                                        <InputField
+                                            name="website"
+                                            value={institutionData.website}
                                             onChange={handleChange}
                                         />
                                         <div className="mt-2">
@@ -133,11 +227,15 @@ const InstitutionProfile = () => {
                                     <>
                                         <h1 className="flex items-center text-2xl font-bold text-gray-800">
                                             {institutionData.institutionName}
-                                            <a href="/">
-                                                <FaLink className="w-4 h-4 ml-2" />
-                                            </a>
+                                            {institutionData.website && (
+                                                <a
+                                                    href={institutionData.website}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer">
+                                                    <FaLink className="w-4 h-4 ml-2" />
+                                                </a>
+                                            )}
                                         </h1>
-
                                         <p className="text-gray-600">{institutionData.adminName}</p>
                                         <p
                                             className={`rounded-md px-2 py-1 mt-2 text-sm inline-block ${
@@ -149,6 +247,7 @@ const InstitutionProfile = () => {
                                 )}
                             </div>
                         </div>
+
                         <div className="mt-4 md:mt-0">
                             {isEditing ? (
                                 <button

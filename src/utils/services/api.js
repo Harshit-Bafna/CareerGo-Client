@@ -26,10 +26,9 @@ api.interceptors.request.use(async (request) => {
         }
     }
     else if (!accessToken && !refreshToken) {
-        const { data } = await axios.post(`http://localhost:8000/api/v1/auth/logout`, {}, { withCredentials: true })
-
-        if (!data.success) {
-            return Promise.reject(data.message)
+        if (!sessionStorage.getItem('redirected')) {
+            sessionStorage.setItem('redirected', 'true');
+            window.location.href = '/logout';
         }
     }
 
