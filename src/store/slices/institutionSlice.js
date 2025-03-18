@@ -167,7 +167,7 @@ export const createCourse = createAsyncThunk('institution/createCourse', async (
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await api.post(`/${institutionURL}/institution/course/${institutionId}`, Payload)
+        const { data } = await api.post(`/${institutionURL}/course/${institutionId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
@@ -189,11 +189,9 @@ export const createCourse = createAsyncThunk('institution/createCourse', async (
     }
 })
 
-export const getAllCourse = createAsyncThunk('institution/getAllCourse', async ({ institutionId, Payload }, thunkAPI) => {
+export const getAllCourse = createAsyncThunk('institution/getAllCourse', async ({ institutionId, category, search }, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
-        const { data } = await api.get(`/${institutionURL}/institution/course/all/${institutionId}`, Payload)
+        const { data } = await api.get(`/${institutionURL}/course/all/${institutionId}/?category=${category}&search=${search}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
@@ -210,16 +208,14 @@ export const getAllCourse = createAsyncThunk('institution/getAllCourse', async (
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
     }
 })
 
-export const getCourseDetails = createAsyncThunk('institution/getCourseDetails', async ({ institutionId, courseId, Payload }, thunkAPI) => {
+export const getCourseDetails = createAsyncThunk('institution/getCourseDetails', async ({ institutionId, courseId }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await api.get(`/${institutionURL}/institution/course/detail/${institutionId}/${courseId}`, Payload)
+        const { data } = await api.get(`/${institutionURL}/course/detail/${institutionId}?courseId=${courseId}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
@@ -245,7 +241,7 @@ export const updateCourseDetails = createAsyncThunk('institution/updateCourseDet
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await api.put(`/${institutionURL}/institution/course/${institutionId}/?courseId=${courseId}`, Payload)
+        const { data } = await api.put(`/${institutionURL}/course/${institutionId}/?courseId=${courseId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
@@ -267,11 +263,11 @@ export const updateCourseDetails = createAsyncThunk('institution/updateCourseDet
     }
 })
 
-export const deteleCourse = createAsyncThunk('institution/deteleCourse', async ({ institutionId, courseId, Payload }, thunkAPI) => {
+export const deteleCourse = createAsyncThunk('institution/deteleCourse', async ({ institutionId, courseId }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await api.delete(`/${institutionURL}/institution/course/${institutionId}/?courseId=${courseId}`, Payload)
+        const { data } = await api.delete(`/${institutionURL}/course/${institutionId}/?courseId=${courseId}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
