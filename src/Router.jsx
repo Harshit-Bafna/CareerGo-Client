@@ -24,6 +24,7 @@ import BookCounselling from './pagesAuthenticated/Counselling/BookCounselling'
 import ViewCounselling from './pagesAuthenticated/Counselling/ViewCounselling'
 import Logout from './pagesAuthenticated/Logout'
 import InstitutionProfile from './pagesAuthenticated/Institution Profile/InstitutionProfile'
+import Support from './pagesAuthenticated/Support' 
 
 export const Router = createBrowserRouter(
     createRoutesFromElements(
@@ -120,6 +121,10 @@ export const Router = createBrowserRouter(
                 <Route
                     path="counselling"
                     element={<ViewCounselling />}
+                />
+                <Route
+                    path="support"
+                    element={<Support />}
                 />
             </Route>
             <Route

@@ -1,35 +1,667 @@
+import { useState, useEffect } from 'react'
+import {
+    FaUser,
+    FaEnvelope,
+    FaPhone,
+    FaVenusMars,
+    FaHeadset,
+    FaChevronRight,
+    FaVideo,
+    FaCalendarAlt,
+    FaClock,
+    FaUniversity,
+    FaRegCalendarCheck,
+    FaArrowRight,
+    FaArrowLeft,
+} from 'react-icons/fa'
+import { MdSchool, MdAttachMoney, MdHome, MdEmail, MdPhone, MdLanguage } from 'react-icons/md'
+import { BsThreeDotsVertical } from 'react-icons/bs'
+import { NavLink } from 'react-router-dom'
+import counsellingDashboard from '../assets/counsellingDashboard.svg'
+import { useBtnNavigation } from '../utils/helper/syncHelper'
+import { useDispatch, useSelector } from 'react-redux'
+import { getBasicInfo } from '../store/slices/userSlice'
+
 const Dashboard = () => {
+    const dispatch = useDispatch()
+    const [profileCompletion] = useState(65)
+    const [setScrollPosition] = useState(0)
+    const { name, emailAddress, profileImage } = useSelector((state) => state.user)
+    const [userData, setUserData] = useState({
+        name: '',
+        email: '',
+        phone: '',
+        gender: '',
+    })
+
+    useEffect(() => {
+        if (name && emailAddress) {
+            setUserData({ name, email: emailAddress })
+        }
+    }, [name, emailAddress])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const response = await dispatch(getBasicInfo())
+
+            if (response.payload && response.payload.data) {
+                const { basicInfo } = response.payload.data
+
+                setUserData({
+                    name: name || '',
+                    email: emailAddress || '',
+                    phone: basicInfo.phone || '',
+                    gender: basicInfo.gender || '',
+                })
+            }
+        }
+
+        fetchData()
+    }, [dispatch, name, emailAddress])
+
+    const upcomingSessions = [
+        {
+            id: 1,
+            institution: 'VIT Bhopal',
+            purpose: 'Career Guidance',
+            date: '2025-02-14',
+            time: '11:57',
+            status: 'Pending',
+            meetingLink: 'https://meet.google.com/abc-defg-hij',
+        },
+        {
+            id: 2,
+            institution: 'IIT Bombay',
+            purpose: 'Admission Process',
+            date: '2025-02-18',
+            time: '14:30',
+            status: 'Upcoming',
+        },
+        {
+            id: 3,
+            institution: 'AIIMS Delhi',
+            purpose: 'Medical Counselling',
+            date: '2025-02-20',
+            time: '09:15',
+            status: 'Pending',
+        },
+        {
+            id: 4,
+            institution: 'NIT Trichy',
+            purpose: 'Scholarship Discussion',
+            date: '2025-02-22',
+            time: '16:00',
+            status: 'Upcoming',
+        },
+    ]
+
+    const completedSessions = [
+        {
+            id: 5,
+            institution: 'AIIMS Delhi',
+            purpose: 'Course Selection',
+            date: '2025-01-25',
+            time: '10:00',
+            status: 'Completed',
+        },
+        {
+            id: 6,
+            institution: 'IIM Ahmedabad',
+            purpose: 'MBA Orientation',
+            date: '2025-01-18',
+            time: '11:30',
+            status: 'Completed',
+        },
+        {
+            id: 7,
+            institution: 'BITS Pilani',
+            purpose: 'Campus Tour',
+            date: '2025-01-10',
+            time: '14:00',
+            status: 'Completed',
+        },
+    ]
+
+    const recommendedInstitutions = [
+        {
+            logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/1d/Indian_Institute_of_Technology_Bombay_Logo.svg/1200px-Indian_Institute_of_Technology_Bombay_Logo.svg.png',
+            abbreviatedName: 'IITB',
+            fees: 200000,
+            hostel: true,
+            name: 'Indian Institute of Technology, Bombay',
+            course: 'B.Tech',
+            duration: 4,
+            contactDetails: {
+                email: 'admin@iitb.ac.in',
+                phone: '9876543210',
+                website: 'https://www.iitb.ac.in/',
+            },
+        },
+        {
+            logo: null,
+            abbreviatedName: 'IITD',
+            fees: 210000,
+            hostel: true,
+            name: 'Indian Institute of Technology, Delhi',
+            course: 'B.Tech + M.Tech',
+            duration: 5,
+            contactDetails: {
+                email: 'admin@iitd.ac.in',
+                phone: '9876543220',
+                website: 'https://www.iitd.ac.in/',
+            },
+        },
+        {
+            logo: null,
+            abbreviatedName: 'IIMA',
+            fees: 2500000,
+            hostel: true,
+            name: 'Indian Institute of Management, Ahmedabad',
+            course: 'MBA',
+            duration: 2,
+            contactDetails: {
+                email: 'admin@iima.ac.in',
+                phone: '9876543230',
+                website: 'https://www.iima.ac.in/',
+            },
+        },
+        {
+            logo: null,
+            abbreviatedName: 'NLSIU',
+            fees: 180000,
+            hostel: true,
+            name: 'National Law School of India University, Bangalore',
+            course: 'LL.M',
+            duration: 1,
+            contactDetails: {
+                email: 'admin@nlsiu.ac.in',
+                phone: '9876543240',
+                website: 'https://www.nls.ac.in/',
+            },
+        },
+        {
+            logo: null,
+            abbreviatedName: 'AIIMS-D',
+            fees: 150000,
+            hostel: true,
+            name: 'All India Institute of Medical Sciences, Delhi',
+            course: 'M.B.B.S',
+            duration: 5,
+            contactDetails: {
+                email: 'admin@aiims.ac.in',
+                phone: '9876543250',
+                website: 'https://www.aiims.edu/',
+            },
+        },
+    ]
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'Upcoming':
+                return 'text-green-600'
+            case 'Pending':
+                return 'text-gold'
+            case 'Completed':
+                return 'text-deep-blue'
+            case 'Rejected':
+                return 'text-red-600'
+            case 'Cancelled':
+                return 'text-red-600'
+            default:
+                return 'text-dark-gray'
+        }
+    }
+
+    const [institutionDropdown, setInstitutionDropdown] = useState(null)
+
+    const toggleDropdown = (id) => {
+        setInstitutionDropdown(institutionDropdown === id ? null : id)
+    }
+
+    const scrollLeft = (containerId) => {
+        const container = document.getElementById(containerId)
+        if (container) {
+            container.scrollBy({ left: -300, behavior: 'smooth' })
+            setScrollPosition(container.scrollLeft - 300)
+        }
+    }
+
+    const scrollRight = (containerId) => {
+        const container = document.getElementById(containerId)
+        if (container) {
+            container.scrollBy({ left: 300, behavior: 'smooth' })
+            setScrollPosition(container.scrollLeft + 300)
+        }
+    }
+
     return (
-        <div>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aspernatur tempora quibusdam eligendi quisquam placeat perspiciatis aperiam
-            totam sequi praesentium quas perferendis cumque, hic eum, iure delectus iste magni neque, blanditiis quasi repellendus dolorum! Sint saepe
-            corrupti error dolore in, enim, necessitatibus illo vitae illum esse aliquam veniam ipsum laboriosam architecto tenetur fugit totam
-            quibusdam. Sed porro, in ullam delectus repellat nobis voluptate eveniet, amet nulla blanditiis veniam labore impedit voluptates dicta
-            reprehenderit fuga vel tempora iure reiciendis. Eius deleniti dolor ea architecto corporis incidunt, optio facilis minima voluptate
-            consectetur provident tempore sed eaque sequi quasi eos. Dignissimos maxime, enim deleniti id quae sed laboriosam accusantium consequuntur
-            asperiores velit sunt. Soluta cumque impedit explicabo mollitia possimus recusandae minima quia beatae laborum eum, atque at dignissimos!
-            Consequuntur nisi laboriosam illum, fugiat temporibus distinctio dolores rem, aliquam porro eius, consequatur saepe. Necessitatibus saepe
-            vero repudiandae a dicta distinctio laborum et officiis aliquid! Excepturi recusandae doloribus dolores laborum a maxime quos! Laudantium,
-            sint! Cum blanditiis esse iure ipsam nam pariatur magnam sit deleniti saepe? In, sit, delectus, dolores nisi cupiditate atque non
-            laboriosam accusantium id sint vero perferendis officia doloremque. Voluptatem, nam. At labore aspernatur sit minus quas numquam totam
-            eaque laboriosam illum explicabo perferendis odio accusamus, sequi dolores dolor ipsam iusto neque ducimus et minima distinctio aut.
-            Quibusdam ex sapiente ab consequuntur tenetur officia sit saepe labore, corporis iusto exercitationem pariatur magnam repellendus vel
-            voluptas tempora nesciunt voluptatum perspiciatis omnis nobis numquam dignissimos, dolore nihil! Facilis natus mollitia quos qui
-            laboriosam ratione quisquam at nostrum molestias eligendi, nemo repellendus similique dolor libero vel est hic accusamus labore alias
-            provident magni laborum et! Doloremque tenetur ut facilis cupiditate cum voluptas iusto dolor nam, maiores, maxime corporis. Qui vitae
-            mollitia aspernatur, aliquid nesciunt reprehenderit esse deserunt, eos eaque officia dolorum aut molestias. Sed hic nesciunt rem veniam
-            magni ea, eligendi eveniet eos cum ipsam optio consequuntur, earum doloremque maxime aut excepturi neque. Sapiente distinctio est delectus
-            beatae modi enim esse perspiciatis voluptatem, expedita repellat placeat harum molestias id vero deleniti ipsum? Rem dicta sit culpa rerum
-            dolores eos numquam quae qui magnam molestias perferendis molestiae accusantium minus ipsum, doloremque veniam maiores blanditiis nostrum
-            fugit corporis. Eaque sunt quam tenetur, quasi, est recusandae earum laborum facere maxime exercitationem dolore quod ipsa in a ab
-            dignissimos. Maxime necessitatibus dolores deleniti maiores, nulla, sequi aut hic quis fuga voluptatum natus illum et nam repellendus
-            facilis veritatis nihil. Voluptatum sapiente repellendus itaque nisi nemo blanditiis praesentium cum odit, ullam cumque velit quia nostrum
-            officiis iure sunt aliquid animi perspiciatis, labore doloribus quam fugiat. Accusantium expedita impedit quidem aspernatur? Porro
-            impedit, nostrum ducimus quasi molestias commodi laboriosam doloremque eligendi, adipisci beatae pariatur, atque excepturi perspiciatis.
-            Tenetur iusto voluptates quo perspiciatis earum nisi velit numquam fugit hic similique maxime magnam sint laudantium dolores corporis
-            consequatur, est cumque provident corrupti blanditiis! Doloribus iure dignissimos fugiat natus similique a molestiae odit dolorum id. Ex
-            officia blanditiis minima unde ipsa magnam rem pariatur, possimus, necessitatibus at minus. Accusamus magnam distinctio impedit cumque
-            explicabo! Tenetur.
+        <div className="min-h-screen bg-background-light p-4 md:p-8">
+            <div className="bg-background-white rounded-lg shadow-input-shadow p-6 mb-6">
+                <div className="flex flex-col md:flex-row items-center justify-between">
+                    <div className="md:w-1/2 mb-4 md:mb-0">
+                        <h1 className="text-2xl md:text-3xl font-heading text-deep-blue mb-2">Welcome to CareerGo</h1>
+                        <p className="text-text-secondary">
+                            Your personalized career guidance platform. Explore top institutions, schedule counselling sessions, and make informed
+                            decisions about your future.
+                        </p>
+                        <div className="mt-4">
+                            <NavLink
+                                to="/dashboard/bookCounselling"
+                                className="bg-deep-blue text-white py-2 px-4 rounded-md hover:bg-navy-blue transition-colors inline-flex items-center">
+                                Book a Counselling Session <FaChevronRight className="ml-2" />
+                            </NavLink>
+                        </div>
+                    </div>
+                    <div className="md:w-1/2 flex justify-center">
+                        <img
+                            src={counsellingDashboard}
+                            alt="Career Counselling"
+                            className="max-w-full h-auto max-h-48"
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="lg:hidden space-y-6 mb-6">
+                <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                    <div className="flex flex-col items-center">
+                        <div className="relative mb-4">
+                            {profileImage ? (
+                                <img
+                                    src={profileImage}
+                                    alt="Profile"
+                                    className="w-24 h-24 rounded-full object-cover border-4 border-deep-blue"
+                                />
+                            ) : (
+                                <FaUser className="w-16 h-16 p-2 text-gray-600 rounded-full object-cover border-4 border-deep-blue" />
+                            )}
+                        </div>
+                        <h2 className="text-xl font-medium text-text-primary">{userData.name}</h2>
+
+                        <div className="w-full mt-6 space-y-3">
+                            <div className="flex items-center text-text-secondary">
+                                <FaEnvelope className="text-deep-blue mr-3" />
+                                <span>{userData.email}</span>
+                            </div>
+                            <div className="flex items-center text-text-secondary">
+                                <FaPhone className="text-deep-blue mr-3" />
+                                <span>{userData.phone ? userData.phone : 'Not Provided'}</span>
+                            </div>
+                            <div className="flex items-center text-text-secondary">
+                                <FaVenusMars className="text-deep-blue mr-3" />
+                                <span>{userData.gender ? userData.gender : 'Not Provided'}</span>
+                            </div>
+                        </div>
+
+                        <NavLink
+                            to="/dashboard/userProfile"
+                            className="mt-6 w-full bg-deep-blue text-white py-2 px-4 rounded-md hover:bg-navy-blue transition-colors flex items-center justify-center">
+                            Edit Profile
+                        </NavLink>
+                    </div>
+                </div>
+
+                <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                    <h3 className="text-lg font-medium text-text-primary mb-4">Profile Completion</h3>
+                    <div className="w-full bg-light-gray rounded-full h-4">
+                        <div
+                            className="bg-deep-blue h-4 rounded-full"
+                            style={{ width: `${profileCompletion}%` }}></div>
+                    </div>
+                    <div className="flex justify-between mt-2">
+                        <span className="text-sm text-text-secondary">{profileCompletion}% Completed</span>
+                        <NavLink
+                            to="/dashboard/userProfile"
+                            className="text-sm text-deep-blue hover:underline">
+                            Complete Now
+                        </NavLink>
+                    </div>
+                </div>
+
+                <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                    <div className="flex items-center mb-4">
+                        <div className="p-3 bg-light-gray rounded-full mr-4">
+                            <FaHeadset className="text-2xl text-deep-blue" />
+                        </div>
+                        <h3 className="text-lg font-medium text-text-primary">Need Help?</h3>
+                    </div>
+                    <p className="text-text-secondary mb-4">Our support team is available 24/7 to assist you with any questions or concerns.</p>
+                    <button
+                        className="w-full bg-gold text-white py-2 px-4 rounded-md hover:bg-deep-indigo transition-colors"
+                        onClick={useBtnNavigation('/dashboard/support')}>
+                        Contact Support
+                    </button>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 space-y-6">
+                    <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-medium text-text-primary">Counselling Sessions</h3>
+                            <NavLink
+                                to="/dashboard/counselling"
+                                className="text-deep-blue hover:underline flex items-center">
+                                View All <FaChevronRight className="ml-1 text-sm" />
+                            </NavLink>
+                        </div>
+
+                        <div className="mb-6">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-md font-medium text-text-secondary flex items-center">
+                                    <FaCalendarAlt className="mr-2" /> Upcoming Sessions
+                                </h4>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => scrollLeft('upcoming-sessions')}
+                                        className="p-1 bg-light-gray rounded-full hover:bg-gray-200">
+                                        <FaArrowLeft className="text-deep-blue" />
+                                    </button>
+                                    <button
+                                        onClick={() => scrollRight('upcoming-sessions')}
+                                        className="p-1 bg-light-gray rounded-full hover:bg-gray-200">
+                                        <FaArrowRight className="text-deep-blue" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {upcomingSessions.length > 0 ? (
+                                <div
+                                    id="upcoming-sessions"
+                                    className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                    {upcomingSessions.map((session) => (
+                                        <div
+                                            key={session.id}
+                                            className="border border-border-light rounded-lg p-4 min-w-[280px] flex-shrink-0">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex items-start space-x-3">
+                                                    <div className="p-2 bg-light-gray rounded-full">
+                                                        <FaUniversity className="text-xl text-navy-blue" />
+                                                    </div>
+                                                    <div>
+                                                        <h5 className="font-medium text-navy-blue">{session.institution}</h5>
+                                                        <p className="text-sm text-dark-gray">{session.purpose}</p>
+                                                    </div>
+                                                </div>
+                                                <span className={`capitalize text-sm font-medium ${getStatusColor(session.status)}`}>
+                                                    {session.status}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-4 mb-3">
+                                                <div className="flex items-center space-x-2 text-dark-gray text-sm">
+                                                    <FaCalendarAlt />
+                                                    <span>{session.date}</span>
+                                                </div>
+                                                <div className="flex items-center space-x-2 text-dark-gray text-sm">
+                                                    <FaClock />
+                                                    <span>{session.time}</span>
+                                                </div>
+                                            </div>
+
+                                            {session.meetingLink && (
+                                                <div className="flex items-center space-x-2 text-deep-blue text-sm">
+                                                    <FaVideo />
+                                                    <a
+                                                        href={session.meetingLink}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="hover:underline">
+                                                        Join Meeting
+                                                    </a>
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-6 border border-border-light rounded-lg">
+                                    <p className="text-text-secondary">No upcoming sessions</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div>
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-md font-medium text-text-secondary flex items-center">
+                                    <FaRegCalendarCheck className="mr-2" /> Completed Sessions
+                                </h4>
+                                <div className="flex space-x-2">
+                                    <button
+                                        onClick={() => scrollLeft('completed-sessions')}
+                                        className="p-1 bg-light-gray rounded-full hover:bg-gray-200">
+                                        <FaArrowLeft className="text-deep-blue" />
+                                    </button>
+                                    <button
+                                        onClick={() => scrollRight('completed-sessions')}
+                                        className="p-1 bg-light-gray rounded-full hover:bg-gray-200">
+                                        <FaArrowRight className="text-deep-blue" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {completedSessions.length > 0 ? (
+                                <div
+                                    id="completed-sessions"
+                                    className="flex overflow-x-auto pb-4 space-x-4 scrollbar-hide"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                                    {completedSessions.map((session) => (
+                                        <div
+                                            key={session.id}
+                                            className="border border-border-light rounded-lg p-4 min-w-[280px] flex-shrink-0">
+                                            <div className="flex justify-between items-start mb-3">
+                                                <div className="flex items-start space-x-3">
+                                                    <div className="p-2 bg-light-gray rounded-full">
+                                                        <FaUniversity className="text-xl text-navy-blue" />
+                                                    </div>
+                                                    <div>
+                                                        <h5 className="font-medium text-navy-blue">{session.institution}</h5>
+                                                        <p className="text-sm text-dark-gray">{session.purpose}</p>
+                                                    </div>
+                                                </div>
+                                                <span className={`capitalize text-sm font-medium ${getStatusColor(session.status)}`}>
+                                                    {session.status}
+                                                </span>
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-4">
+                                                <div className="flex items-center space-x-2 text-dark-gray text-sm">
+                                                    <FaCalendarAlt />
+                                                    <span>{session.date}</span>
+                                                </div>
+                                                <div className="flex items-center space-x-2 text-dark-gray text-sm">
+                                                    <FaClock />
+                                                    <span>{session.time}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-6 border border-border-light rounded-lg">
+                                    <p className="text-text-secondary">No completed sessions</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-lg font-medium text-text-primary">Recommended Institutions</h3>
+                            <NavLink
+                                to="/dashboard/recommendations"
+                                className="text-deep-blue hover:underline flex items-center">
+                                View All <FaChevronRight className="ml-1 text-sm" />
+                            </NavLink>
+                        </div>
+
+                        <div className="space-y-4">
+                            {recommendedInstitutions.slice(0, 5).map((institution) => (
+                                <div
+                                    key={institution.abbreviatedName}
+                                    className="border border-border-light rounded-lg p-4 transition-all hover:shadow-md">
+                                    <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+                                        <div className="flex items-center gap-4">
+                                            {institution.logo ? (
+                                                <img
+                                                    src={institution.logo || '/placeholder.svg'}
+                                                    alt={`${institution.name} logo`}
+                                                    className="w-12 h-12 object-contain"
+                                                />
+                                            ) : (
+                                                <div className="w-12 h-12 bg-navy-blue text-white rounded-full flex items-center justify-center font-bold text-sm">
+                                                    {institution.abbreviatedName}
+                                                </div>
+                                            )}
+                                            <div>
+                                                <h4 className="font-medium text-text-primary">{institution.name}</h4>
+                                                <div className="flex items-center gap-1 text-text-secondary text-sm">
+                                                    <MdSchool className="text-deep-blue" />
+                                                    <span>{institution.course}</span>
+                                                    <span className="mx-1">•</span>
+                                                    <span>
+                                                        {institution.duration} {institution.duration > 1 ? 'years' : 'year'}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-1 text-text-secondary text-sm mt-1">
+                                                    <MdAttachMoney className="text-deep-blue" />
+                                                    <span>₹{institution.fees.toLocaleString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-1 text-text-secondary text-sm">
+                                                <MdHome className="text-deep-blue" />
+                                                <span>{institution.hostel ? 'Hostel Available' : 'No Hostel'}</span>
+                                            </div>
+
+                                            <div className="relative">
+                                                <button
+                                                    onClick={() => toggleDropdown(institution.abbreviatedName)}
+                                                    className="p-2 hover:bg-background-light rounded-full">
+                                                    <BsThreeDotsVertical className="text-text-secondary" />
+                                                </button>
+                                                {institutionDropdown === institution.abbreviatedName && (
+                                                    <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+                                                        <div className="px-4 py-3 border-b border-border-light">
+                                                            <h4 className="font-medium">Contact Details</h4>
+                                                            <div className="mt-2 space-y-1 text-sm">
+                                                                <div className="flex items-center gap-2">
+                                                                    <MdEmail className="text-deep-blue" />
+                                                                    <a
+                                                                        href={`mailto:${institution.contactDetails.email}`}
+                                                                        className="hover:underline">
+                                                                        {institution.contactDetails.email}
+                                                                    </a>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <MdPhone className="text-deep-blue" />
+                                                                    <a
+                                                                        href={`tel:${institution.contactDetails.phone}`}
+                                                                        className="hover:underline">
+                                                                        {institution.contactDetails.phone}
+                                                                    </a>
+                                                                </div>
+                                                                <div className="flex items-center gap-2">
+                                                                    <MdLanguage className="text-deep-blue" />
+                                                                    <a
+                                                                        href={institution.contactDetails.website}
+                                                                        target="_blank"
+                                                                        rel="noopener noreferrer"
+                                                                        className="hover:underline">
+                                                                        Website
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <button className="block w-full text-left px-4 py-2 text-sm text-text-primary hover:bg-background-light">
+                                                            View Full Details
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="hidden lg:block space-y-6">
+                    <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                        <div className="flex flex-col items-center">
+                            <div className="relative mb-4">
+                                {profileImage ? (
+                                    <img
+                                        src={profileImage}
+                                        alt="Profile"
+                                        className="w-24 h-24 rounded-full object-cover border-4 border-deep-blue"
+                                    />
+                                ) : (
+                                    <FaUser className="w-16 h-16 p-2 text-gray-600 rounded-full object-cover border-4 border-deep-blue" />
+                                )}
+                            </div>
+                            <h2 className="text-xl font-medium text-text-primary">{userData.name}</h2>
+
+                            <div className="w-full mt-6 space-y-3">
+                                <div className="flex items-center text-text-secondary">
+                                    <FaEnvelope className="text-deep-blue mr-3" />
+                                    <span>{userData.email}</span>
+                                </div>
+                                <div className="flex items-center text-text-secondary">
+                                    <FaPhone className="text-deep-blue mr-3" />
+                                    <span>{userData.phone ? userData.phone : 'Not Provided'}</span>
+                                </div>
+                                <div className="flex items-center text-text-secondary">
+                                    <FaVenusMars className="text-deep-blue mr-3" />
+                                    <span>{userData.gender ? userData.gender : 'Not Provided'}</span>
+                                </div>
+                            </div>
+
+                            <NavLink
+                                to="/dashboard/userProfile"
+                                className="mt-6 w-full bg-deep-blue text-white py-2 px-4 rounded-md hover:bg-navy-blue transition-colors flex items-center justify-center">
+                                Edit Profile
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                        <h3 className="text-lg font-medium text-text-primary mb-4">Profile Completion</h3>
+                        <div className="w-full bg-light-gray rounded-full h-4">
+                            <div
+                                className="bg-deep-blue h-4 rounded-full"
+                                style={{ width: `${profileCompletion}%` }}></div>
+                        </div>
+                        <div className="flex justify-between mt-2">
+                            <span className="text-sm text-text-secondary">{profileCompletion}% Completed</span>
+                            <NavLink
+                                to="/dashboard/userProfile"
+                                className="text-sm text-deep-blue hover:underline">
+                                Complete Now
+                            </NavLink>
+                        </div>
+                    </div>
+
+                    <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
+                        <div className="flex items-center mb-4">
+                            <div className="p-3 bg-light-gray rounded-full mr-4">
+                                <FaHeadset className="text-2xl text-deep-blue" />
+                            </div>
+                            <h3 className="text-lg font-medium text-text-primary">Need Help?</h3>
+                        </div>
+                        <p className="text-text-secondary mb-4">Our support team is available 24/7 to assist you with any questions or concerns.</p>
+                        <button
+                            className="w-full bg-gold text-white py-2 px-4 rounded-md hover:bg-deep-indigo transition-colors"
+                            onClick={useBtnNavigation('/dashboard/support')}>
+                            Contact Support
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     )
 }
