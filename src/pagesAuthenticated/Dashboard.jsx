@@ -487,14 +487,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="bg-background-white rounded-lg shadow-input-shadow p-6">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-lg font-medium text-text-primary">Recommended Institutions</h3>
-                            <NavLink
-                                to="/dashboard/recommendations"
-                                className="text-deep-blue hover:underline flex items-center">
-                                View All <FaChevronRight className="ml-1 text-sm" />
-                            </NavLink>
-                        </div>
+                        <h3 className="text-lg font-medium text-text-primary mb-6">Recommended Institutions</h3>
 
                         <div className="space-y-4">
                             {recommendedInstitutions.slice(0, 5).map((institution) => (

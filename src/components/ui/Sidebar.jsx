@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { FaSignOutAlt, FaHome, FaBookOpen, FaUser, FaLightbulb, FaLock, FaHeadset } from 'react-icons/fa'
+import { FaBookOpen, FaUser, FaLightbulb, FaLock, FaHeadset } from 'react-icons/fa'
 import { LuListCollapse } from 'react-icons/lu'
 import { IoIosArrowDown } from 'react-icons/io'
 import { BiSolidInstitution } from 'react-icons/bi'
+import { MdSpaceDashboard } from 'react-icons/md'
 import logoWhite from '../../assets/logo-white.png'
 import logoIconWhite from '../../assets/logoIcon-white.png'
 import { NavLink } from 'react-router-dom'
@@ -24,7 +25,7 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                 <nav className="mt-5 space-y-2">
                     <SidebarItem
                         to="/dashboard"
-                        icon={<FaHome />}
+                        icon={<MdSpaceDashboard />}
                         text="Dashboard"
                         isSidebarOpen={isSidebarOpen}
                     />
@@ -105,13 +106,6 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                         to="/dashboard/support"
                         icon={<FaHeadset />}
                         text="Support"
-                        isSidebarOpen={isSidebarOpen}
-                    />
-
-                    <SidebarItem
-                        to="/logout"
-                        icon={<FaSignOutAlt />}
-                        text="Logout"
                         isSidebarOpen={isSidebarOpen}
                     />
                 </nav>
