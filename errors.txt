@@ -1,2 +1,2 @@
 1. BasicInfo section of userProfile is sending all fields to the backend even updating a single field.
- 
+2. remove success response message from slices
