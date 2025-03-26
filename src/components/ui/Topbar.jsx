@@ -6,7 +6,7 @@ export default function Topbar({ isTopbarDropdownOpen, setTopbarDropdownOpen }) 
     const { name, emailAddress, profileImage } = useSelector((state) => state.user)
 
     return (
-        <div className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-end items-center z-[49]">
+        <div className="fixed top-0 left-0 w-full bg-white shadow-xs border-b border-light-gray p-4 h-16 flex justify-end items-center z-[49]">
             <div
                 className="relative"
                 onMouseEnter={() => setTopbarDropdownOpen(true)}
