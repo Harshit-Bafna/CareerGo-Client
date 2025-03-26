@@ -1,41 +1,28 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { startLoading, stopLoading } from "./loaderSlice"
 import { setError } from "./errorSlice"
-import { setSuccess } from "./messageSlice"
-import successMessage from "../../utils/constants/successMessage"
-import axios from "axios"
-import config from "../../data/config"
-import { selfIdentification } from "./userSlice"
+import api from "../../utils/services/api"
 
-const serverURL = config.SERVER_URL
-const authURL = 'api/v1/auth'
 const institutionURL = 'api/v1/institution'
 
-const initialState = {
-    isLoggedIn: false,
-    data: null,
-    token: null,
-    code: null
-}
+const initialState = null
 
-export const registerUser = createAsyncThunk('auth/create', async (userPayload, thunkAPI) => {
+export const updateInstitutionLogo = createAsyncThunk('institution/updateLogo', async ({ institutionId, logo }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.post(`${serverURL}/${authURL}/create`, userPayload)
+        const { data } = await api.put(`/${institutionURL}/logo/${institutionId}?logo=${logo}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
-
         return data
 
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -46,24 +33,22 @@ export const registerUser = createAsyncThunk('auth/create', async (userPayload, 
     }
 })
 
-export const registerInstitution = createAsyncThunk('auth/createInstitution', async (Payload, thunkAPI) => {
+export const updateInstitutionDetails = createAsyncThunk('institution/updateDetails', async ({ institutionId, Payload }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.post(`${serverURL}/${institutionURL}/create`, Payload)
+        const { data } = await api.put(`/${institutionURL}/details/${institutionId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.institutionResgister))
-
         return data
 
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -74,24 +59,44 @@ export const registerInstitution = createAsyncThunk('auth/createInstitution', as
     }
 })
 
-export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thunkAPI) => {
+export const getAllInstitutions = createAsyncThunk('institution/get', async ({ search, page, limit }, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
-        const { data } = await axios.post(`${serverURL}/${authURL}/login`, loginPayload, { withCredentials: true })
+        const { data } = await api.get(`/${institutionURL}/getAllInstitutionList?search=${search}&page=${page}&limit=${limit}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(selfIdentification())
-        thunkAPI.dispatch(setSuccess(successMessage.userLogin))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    }
+})
+
+export const getInstitutionDetails = createAsyncThunk('institution/getDetails', async ({ institutionId, Payload }, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading())
+
+        const { data } = await api.get(`/${institutionURL}/details/${institutionId}`, Payload)
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        return data
+
+    } catch (error) {
+        const errorMessage =
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -102,23 +107,22 @@ export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thu
     }
 })
 
-export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) => {
+export const createCourseCategory = createAsyncThunk('institution/createCourseCategory', async ({ institutionId, Payload }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.put(`${serverURL}/${authURL}/logout`, { withCredentials: true })
+        const { data } = await api.post(`/${institutionURL}/courseCategory/${institutionId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userLogout))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -129,23 +133,22 @@ export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) =>
     }
 })
 
-export const forgetPassword = createAsyncThunk('auth/forgotPassword', async (Payload, thunkAPI) => {
+export const getCourseCategory = createAsyncThunk('institution/getCourseCategory', async ({ institutionId }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.put(`${serverURL}/${authURL}/forgot-password?emailAddress=${Payload.emailAddress}`, { withCredentials: true })
+        const { data } = await api.get(`/${institutionURL}/courseCategory/${institutionId}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userForgotPassword))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -156,23 +159,22 @@ export const forgetPassword = createAsyncThunk('auth/forgotPassword', async (Pay
     }
 })
 
-export const resetPassword = createAsyncThunk('auth/resetPassword', async (Payload, thunkAPI) => {
+export const deleteCourseCategory = createAsyncThunk('institution/deleteCourseCategory', async ({ institutionId, categoryName }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.put(`${serverURL}/${authURL}/reset-password/${Payload.token}`, Payload, { withCredentials: true })
+        const { data } = await api.delete(`/${institutionURL}/courseCategory/${institutionId}/?categoryName=${categoryName}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userResetPassword))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -183,23 +185,22 @@ export const resetPassword = createAsyncThunk('auth/resetPassword', async (Paylo
     }
 })
 
-export const verifyEmail = createAsyncThunk('auth/confirmation', async (Payload, thunkAPI) => {
+export const createCourse = createAsyncThunk('institution/createCourse', async ({ institutionId, Payload }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.put(`${serverURL}/${authURL}/confirmation/${Payload.token}?code=${Payload.code}`, {}, { withCredentials: true })
+        const { data } = await api.post(`/${institutionURL}/course/${institutionId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userVerifyEmail))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -210,23 +211,44 @@ export const verifyEmail = createAsyncThunk('auth/confirmation', async (Payload,
     }
 })
 
-export const ResendVerifyEmailLink = createAsyncThunk('auth/confirmation', async ({ emailAddress }, thunkAPI) => {
+export const getAllCourse = createAsyncThunk('institution/getAllCourse', async ({ institutionId, category, search }, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
-        const { data } = await axios.put(`${serverURL}/${authURL}/resend/email-verification?emailAddress=${emailAddress}`, {}, { withCredentials: true })
+        const { data } = await api.get(`/${institutionURL}/course/all/${institutionId}/?category=${category}&search=${search}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userResendVerificationEmail))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    }
+})
+
+export const getCourseDetails = createAsyncThunk('institution/getCourseDetails', async ({ institutionId, courseId }, thunkAPI) => {
+    try {
+        thunkAPI.dispatch(startLoading())
+
+        const { data } = await api.get(`/${institutionURL}/course/detail/${institutionId}?courseId=${courseId}`)
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        return data
+
+    } catch (error) {
+        const errorMessage =
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -237,23 +259,22 @@ export const ResendVerifyEmailLink = createAsyncThunk('auth/confirmation', async
     }
 })
 
-export const changePassword = createAsyncThunk('auth/changePassword', async (Payload, thunkAPI) => {
+export const updateCourseDetails = createAsyncThunk('institution/updateCourseDetails', async ({ institutionId, courseId, Payload }, thunkAPI) => {
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.put(`${serverURL}/${authURL}/change-password`, Payload, { withCredentials: true })
+        const { data } = await api.put(`/${institutionURL}/course/${institutionId}/?courseId=${courseId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userChangePassword))
-
         return data
+
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -264,9 +285,11 @@ export const changePassword = createAsyncThunk('auth/changePassword', async (Pay
     }
 })
 
-export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, thunkAPI) => {
+export const deteleCourse = createAsyncThunk('institution/deteleCourse', async ({ institutionId, courseId }, thunkAPI) => {
     try {
-        const { data } = await axios.post(`${serverURL}/${authURL}/refresh-token`, {}, { withCredentials: true })
+        thunkAPI.dispatch(startLoading())
+
+        const { data } = await api.delete(`/${institutionURL}/course/${institutionId}/?courseId=${courseId}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
@@ -277,36 +300,21 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, thun
 
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
+    } finally {
+        thunkAPI.dispatch(stopLoading())
     }
 })
 
-const authSlice = createSlice({
-    name: 'auth',
+const institutionSlice = createSlice({
+    name: 'institution',
     initialState,
     reducers: {},
-    extraReducers: (builder) => {
-        builder
-            .addCase(userLogin.pending, (state) => {
-                state.isLoggedIn = false
-            })
-            .addCase(userLogin.fulfilled, (state, action) => {
-                state.isLoggedIn = true
-                state.data = action.payload.data
-            })
-            .addCase(userLogin.rejected, (state) => {
-                state.isLoggedIn = false
-            })
-            .addCase(userLogout.fulfilled, (state) => {
-                state.isLoggedIn = false
-                state.data = null
-            })
-    },
 })
 
-export default authSlice.reducer
+export default institutionSlice.reducer

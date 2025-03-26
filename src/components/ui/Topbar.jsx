@@ -1,4 +1,4 @@
-import { FaUserCircle, FaUser, FaSignOutAlt } from 'react-icons/fa'
+import { FaUserCircle, FaUser, FaSignOutAlt, FaHeadset } from 'react-icons/fa'
 import { NavLink } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -6,7 +6,7 @@ export default function Topbar({ isTopbarDropdownOpen, setTopbarDropdownOpen }) 
     const { name, emailAddress, profileImage } = useSelector((state) => state.user)
 
     return (
-        <div className="fixed top-0 left-0 w-full bg-white shadow-md p-4 flex justify-end items-center z-[49]">
+        <div className="fixed top-0 left-0 w-full bg-white shadow-xs border-b border-light-gray p-4 h-16 flex justify-end items-center z-[49]">
             <div
                 className="relative"
                 onMouseEnter={() => setTopbarDropdownOpen(true)}
@@ -51,8 +51,13 @@ export default function Topbar({ isTopbarDropdownOpen, setTopbarDropdownOpen }) 
                         to="/dashboard/userProfile"
                     />
                     <DropdownItem
-                        icon={<FaSignOutAlt />}
-                        text="Logout"
+                        icon={<FaHeadset />}
+                        text="Support"
+                        to="/dashboard/support"
+                    />
+                    <DropdownItem
+                        icon={<FaSignOutAlt className="text-red-500" />}
+                        text={<span className="text-red-500">Logout</span>}
                         to="/logout"
                     />
                 </div>

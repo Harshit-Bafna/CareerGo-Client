@@ -1,182 +1,28 @@
 import { useState, useEffect, useRef } from 'react'
-import {
-    FaGraduationCap,
-    FaSchool,
-    FaFilter,
-    FaDownload,
-    FaEnvelope,
-    FaPhone,
-    FaGlobe,
-    FaEdit,
-    FaTrash,
-    FaPlus,
-    FaTimes,
-    FaCheck,
-    FaAward,
-} from 'react-icons/fa'
+import { useDispatch, useSelector } from 'react-redux'
+import { FaFilter, FaDownload, FaEnvelope, FaPhone, FaGlobe, FaEdit, FaTrash, FaPlus, FaTimes, FaCheck, FaAward } from 'react-icons/fa'
 import { IoMdTime } from 'react-icons/io'
 import { MdOutlineCastForEducation, MdOutlineAttachMoney, MdCloudUpload } from 'react-icons/md'
 import { BsBook, BsCalendarCheck, BsExclamationTriangle } from 'react-icons/bs'
 import { HiOutlineAcademicCap } from 'react-icons/hi'
+import {
+    createCourseCategory,
+    getCourseCategory,
+    deleteCourseCategory,
+    createCourse,
+    getAllCourse,
+    getCourseDetails,
+    updateCourseDetails,
+    deteleCourse,
+} from '../../store/slices/institutionSlice'
 
-const initialCourseData = [
-    {
-        id: 1,
-        name: 'B.Tech Computer Science',
-        category: 'Undergraduate (UG) Programs',
-        type: 'college',
-        duration: '4 years',
-        eligibility: '10+2 with PCM, minimum 60%',
-        mode: 'Offline',
-        fees: '₹1,50,000 per annum',
-        syllabus: [
-            'Semester 1: Introduction to Programming, Mathematics I, Physics',
-            'Semester 2: Data Structures, Mathematics II, Digital Electronics',
-            'Semester 3: Object-Oriented Programming, Database Systems, Computer Networks',
-            'Semester 4: Operating Systems, Algorithms, Software Engineering',
-            'Semester 5: Web Technologies, Machine Learning, Computer Architecture',
-            'Semester 6: Artificial Intelligence, Cloud Computing, Mobile App Development',
-            'Semester 7: Big Data Analytics, Information Security, Elective I',
-            'Semester 8: Project Work, Elective II, Elective III',
-        ],
-        admissionProcess: 'Entrance Exam followed by Counselling',
-        contactInfo: {
-            email: 'admissions@vit.edu',
-            phone: '+91-9876543210',
-            website: 'www.vit.edu',
-        },
-        brochureUrl: '/brochures/btech-cs.pdf',
-        brochureFile: null,
-    },
-    {
-        id: 2,
-        name: 'M.Tech Computer Science',
-        category: 'Postgraduate (PG) Programs',
-        type: 'college',
-        duration: '2 years',
-        eligibility: 'B.Tech/B.E. with minimum 65%',
-        mode: 'Offline',
-        fees: '₹1,80,000 per annum',
-        syllabus: [
-            'Semester 1: Advanced Algorithms, Advanced Database Systems, Research Methodology',
-            'Semester 2: Machine Learning, Cloud Computing, Elective I',
-            'Semester 3: Thesis Work I, Elective II, Elective III',
-            'Semester 4: Thesis Work II',
-        ],
-        admissionProcess: 'GATE Score followed by Interview',
-        contactInfo: {
-            email: 'pg-admissions@vit.edu',
-            phone: '+91-9876543211',
-            website: 'www.vit.edu/pg',
-        },
-        brochureUrl: '/brochures/mtech-cs.pdf',
-        brochureFile: null,
-    },
-    {
-        id: 3,
-        name: 'Ph.D. in Computer Science',
-        category: 'Ph.D. Programs',
-        type: 'college',
-        duration: '3-5 years',
-        eligibility: 'M.Tech/M.E. with minimum 70%',
-        mode: 'Offline',
-        fees: '₹1,00,000 per annum',
-        syllabus: ['Research Methodology', 'Advanced Topics in Computer Science', 'Thesis Work'],
-        admissionProcess: 'Entrance Test followed by Interview',
-        contactInfo: {
-            email: 'phd-admissions@vit.edu',
-            phone: '+91-9876543212',
-            website: 'www.vit.edu/phd',
-        },
-        brochureUrl: '/brochures/phd-cs.pdf',
-        brochureFile: null,
-    },
-    {
-        id: 4,
-        name: 'Diploma in Web Development',
-        category: 'Diploma & Certificate Courses',
-        type: 'college',
-        duration: '1 year',
-        eligibility: '10+2 with minimum 50%',
-        mode: 'Hybrid',
-        fees: '₹75,000',
-        syllabus: ['HTML, CSS, JavaScript', 'React.js, Node.js', 'Database Management', 'Project Work'],
-        admissionProcess: 'Direct Admission',
-        contactInfo: {
-            email: 'diploma-admissions@vit.edu',
-            phone: '+91-9876543213',
-            website: 'www.vit.edu/diploma',
-        },
-        brochureUrl: '/brochures/diploma-web.pdf',
-        brochureFile: null,
-    },
-    {
-        id: 5,
-        name: 'Science Stream (PCM)',
-        category: 'Senior Secondary Education (Class 11-12)',
-        type: 'school',
-        duration: '2 years',
-        eligibility: 'Class 10 with minimum 60%',
-        mode: 'Offline',
-        fees: '₹80,000 per annum',
-        syllabus: [
-            'Physics: Mechanics, Thermodynamics, Optics, Electromagnetism',
-            'Chemistry: Organic, Inorganic, Physical Chemistry',
-            'Mathematics: Algebra, Calculus, Trigonometry, Statistics',
-        ],
-        admissionProcess: 'Entrance Test followed by Interview',
-        contactInfo: {
-            email: 'school-admissions@vit.edu',
-            phone: '+91-9876543214',
-            website: 'www.vit.edu/school',
-        },
-        brochureUrl: '/brochures/school-pcm.pdf',
-        brochureFile: null,
-    },
-    {
-        id: 6,
-        name: 'Computer Science (Class 9-10)',
-        category: 'Secondary Education (Class 9-10)',
-        type: 'school',
-        duration: '2 years',
-        eligibility: 'Class 8 with minimum 50%',
-        mode: 'Offline',
-        fees: '₹70,000 per annum',
-        syllabus: ['Computer Fundamentals', 'Programming Basics', 'Web Design', 'Database Concepts'],
-        admissionProcess: 'Direct Admission',
-        contactInfo: {
-            email: 'school-admissions@vit.edu',
-            phone: '+91-9876543215',
-            website: 'www.vit.edu/school',
-        },
-        brochureUrl: '/brochures/school-cs.pdf',
-        brochureFile: null,
-    },
-    {
-        id: 7,
-        name: 'Robotics Club',
-        category: 'Extracurricular & Skill-Based Courses',
-        type: 'school',
-        duration: '1 year',
-        eligibility: 'Open for all students',
-        mode: 'Offline',
-        fees: '₹15,000',
-        syllabus: ['Introduction to Robotics', 'Building Simple Robots', 'Programming Robots', 'Robotics Competitions'],
-        admissionProcess: 'Registration',
-        contactInfo: {
-            email: 'robotics@vit.edu',
-            phone: '+91-9876543216',
-            website: 'www.vit.edu/robotics',
-        },
-        brochureUrl: '/brochures/robotics.pdf',
-        brochureFile: null,
-    },
-]
+const initialCourseData = []
 
 const CoursesOffered = () => {
-    const [courseData, setCourseData] = useState(initialCourseData)
-    const [selectedType, setSelectedType] = useState('all')
-    const [selectedCategory, setSelectedCategory] = useState('all')
+    const dispatch = useDispatch()
+    const [courseData] = useState(initialCourseData)
+    const [categories, setCategories] = useState([])
+    const [selectedCategories, setSelectedCategories] = useState([])
     const [searchTerm, setSearchTerm] = useState('')
     const [filteredCourses, setFilteredCourses] = useState(courseData)
     const [selectedCourse, setSelectedCourse] = useState(null)
@@ -187,6 +33,11 @@ const CoursesOffered = () => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
     const [courseToDelete, setCourseToDelete] = useState(null)
     const [activeFilters, setActiveFilters] = useState([])
+    const [showCategoryForm, setShowCategoryForm] = useState(false)
+    const [newCategoryName, setNewCategoryName] = useState('')
+    const [showDeleteCategoryConfirm, setShowDeleteCategoryConfirm] = useState(false)
+    const [categoryToDelete, setCategoryToDelete] = useState(null)
+    const [categoryError, setCategoryError] = useState(null)
 
     const [formData, setFormData] = useState({
         id: null,
@@ -210,18 +61,51 @@ const CoursesOffered = () => {
 
     const fileInputRef = useRef(null)
 
+    const { institutionId } = useSelector((state) => state.user)
+
+    useEffect(() => {
+        const fetchCourseCategories = async () => {
+            setCategoryError(null)
+
+            const response = await dispatch(getCourseCategory({ institutionId })).unwrap()
+
+            if (response.success && response.data.courseCategory) {
+                const fetchedCategories = response.data.courseCategory.courseCategory || []
+                setCategories(fetchedCategories)
+            }
+        }
+
+        fetchCourseCategories()
+    }, [dispatch, institutionId])
+
+    useEffect(() => {
+        const fetchCourses = async () => {
+            const categoryParam = selectedCategories.length > 0 ? selectedCategories.join(',') : ''
+            const searchParam = searchTerm || ''
+
+            const response = await dispatch(
+                getAllCourse({
+                    institutionId,
+                    category: categoryParam,
+                    search: searchParam,
+                })
+            ).unwrap()
+
+            if (response.success && response.data.courses) {
+                setFilteredCourses(response.data.courses)
+            }
+        }
+
+        fetchCourses()
+    }, [dispatch, institutionId, selectedCategories, searchTerm])
+
     useEffect(() => {
         let result = courseData
         const activeFiltersList = []
 
-        if (selectedType !== 'all') {
-            result = result.filter((course) => course.type === selectedType)
-            activeFiltersList.push(`Type: ${selectedType === 'college' ? 'College' : 'School'}`)
-        }
-
-        if (selectedCategory !== 'all') {
-            result = result.filter((course) => course.category === selectedCategory)
-            activeFiltersList.push(`Category: ${selectedCategory}`)
+        if (selectedCategories.length > 0) {
+            result = result.filter((course) => selectedCategories.includes(course.category))
+            activeFiltersList.push(`Categories: ${selectedCategories.join(', ')}`)
         }
 
         if (searchTerm) {
@@ -234,14 +118,20 @@ const CoursesOffered = () => {
 
         setFilteredCourses(result)
         setActiveFilters(activeFiltersList)
-    }, [selectedType, selectedCategory, searchTerm, courseData])
+    }, [selectedCategories, searchTerm, courseData])
 
-    const collegeCategories = [...new Set(courseData.filter((course) => course.type === 'college').map((course) => course.category))]
-    const schoolCategories = [...new Set(courseData.filter((course) => course.type === 'school').map((course) => course.category))]
+    const handleCourseSelect = async (course) => {
+        const response = await dispatch(
+            getCourseDetails({
+                institutionId,
+                courseId: course._id,
+            })
+        ).unwrap()
 
-    const handleCourseSelect = (course) => {
-        setSelectedCourse(course)
-        setShowModal(true)
+        if (response.success && response.data.course) {
+            setSelectedCourse(response.data.course)
+            setShowModal(true)
+        }
     }
 
     const handleCloseModal = () => {
@@ -312,13 +202,12 @@ const CoursesOffered = () => {
 
     const handleAddCourse = () => {
         setFormData({
-            id: Date.now(),
             name: '',
             category: '',
             type: 'college',
             duration: '',
             eligibility: '',
-            mode: 'Offline',
+            mode: 'Online',
             fees: '',
             syllabus: [''],
             admissionProcess: '',
@@ -336,20 +225,77 @@ const CoursesOffered = () => {
 
     const handleEditCourse = (course) => {
         setFormData({
-            ...course,
+            _id: course._id,
+            name: course.courseName,
+            category: course.category,
+            type: 'college',
+            duration: course.duration.toString(),
+            eligibility: course.eligibility,
+            mode: course.mode,
+            fees: course.fees ? `₹${course.fees}` : '',
+            syllabus: course.syllabus || [''],
+            admissionProcess: course.admissionProcess || '',
+            contactInfo: {
+                email: course.email || '',
+                phone: course.phone || '',
+                website: course.website || '',
+            },
+            brochureUrl: course.brochure || '',
+            brochureFile: null,
         })
         setFormMode('edit')
         setShowForm(true)
         setShowModal(false)
     }
 
-    const handleFormSubmit = (e) => {
+    const handleFormSubmit = async (e) => {
         e.preventDefault()
 
+        const coursePayload = {
+            courseName: formData.name,
+            category: formData.category,
+            duration: Number.parseInt(formData.duration, 10),
+            eligibility: formData.eligibility,
+            mode: formData.mode,
+            fees: Number.parseFloat(formData.fees.replace(/[₹,]/g, '')),
+            syllabus: formData.syllabus,
+            admissionProcess: formData.admissionProcess,
+            email: formData.contactInfo.email,
+            phone: formData.contactInfo.phone,
+            website: formData.contactInfo.website,
+            brochure: formData.brochureUrl,
+        }
+
         if (formMode === 'add') {
-            setCourseData([...courseData, formData])
+            await dispatch(
+                createCourse({
+                    institutionId,
+                    Payload: coursePayload,
+                })
+            ).unwrap()
         } else {
-            setCourseData(courseData.map((course) => (course.id === formData.id ? formData : course)))
+            await dispatch(
+                updateCourseDetails({
+                    institutionId,
+                    courseId: formData._id,
+                    Payload: coursePayload,
+                })
+            ).unwrap()
+        }
+
+        const categoryParam = selectedCategories.length > 0 ? selectedCategories.join(',') : ''
+        const searchParam = searchTerm || ''
+
+        const response = await dispatch(
+            getAllCourse({
+                institutionId,
+                category: categoryParam,
+                search: searchParam,
+            })
+        ).unwrap()
+
+        if (response.success && response.data.courses) {
+            setFilteredCourses(response.data.courses)
         }
 
         setShowForm(false)
@@ -361,94 +307,165 @@ const CoursesOffered = () => {
         setShowModal(false)
     }
 
-    const handleDeleteCourse = () => {
-        setCourseData(courseData.filter((course) => course.id !== courseToDelete.id))
+    const handleDeleteCourse = async () => {
+        await dispatch(
+            deteleCourse({
+                institutionId,
+                courseId: courseToDelete._id,
+            })
+        ).unwrap()
+
+        const categoryParam = selectedCategories.length > 0 ? selectedCategories.join(',') : ''
+        const searchParam = searchTerm || ''
+
+        const response = await dispatch(
+            getAllCourse({
+                institutionId,
+                category: categoryParam,
+                search: searchParam,
+            })
+        ).unwrap()
+
+        if (response.success && response.data.courses) {
+            setFilteredCourses(response.data.courses)
+        }
+
         setShowDeleteConfirm(false)
         setCourseToDelete(null)
     }
 
     const resetFilters = () => {
-        setSelectedType('all')
-        setSelectedCategory('all')
+        setSelectedCategories([])
         setSearchTerm('')
+    }
+
+    const handleAddCategory = () => {
+        setShowCategoryForm(true)
+    }
+
+    const handleCategoryFormSubmit = async (e) => {
+        e.preventDefault()
+
+        if (newCategoryName.trim() && !categories.includes(newCategoryName.trim())) {
+            setCategoryError(null)
+
+            const payload = {
+                courseCategory: newCategoryName.trim(),
+            }
+
+            await dispatch(
+                createCourseCategory({
+                    institutionId,
+                    Payload: payload,
+                })
+            ).unwrap()
+
+            const response = await dispatch(getCourseCategory({ institutionId })).unwrap()
+
+            if (response.success && response.data.courseCategory) {
+                const fetchedCategories = response.data.courseCategory.courseCategory || []
+                setCategories(fetchedCategories)
+            }
+
+            setShowCategoryForm(false)
+            setNewCategoryName('')
+        }
+    }
+
+    const toggleCategorySelection = (category) => {
+        if (selectedCategories.includes(category)) {
+            setSelectedCategories(selectedCategories.filter((cat) => cat !== category))
+        } else {
+            setSelectedCategories([...selectedCategories, category])
+        }
+    }
+
+    const handleDeleteCategory = (category) => {
+        setCategoryToDelete(category)
+        setShowDeleteCategoryConfirm(true)
+    }
+
+    const confirmDeleteCategory = async () => {
+        setCategoryError(null)
+
+        await dispatch(
+            deleteCourseCategory({
+                institutionId,
+                categoryName: categoryToDelete,
+            })
+        ).unwrap()
+
+        const response = await dispatch(getCourseCategory({ institutionId })).unwrap()
+
+        if (response.success && response.data.courseCategory) {
+            const fetchedCategories = response.data.courseCategory.courseCategory || []
+            setCategories(fetchedCategories)
+
+            if (selectedCategories.includes(categoryToDelete)) {
+                setSelectedCategories(selectedCategories.filter((cat) => cat !== categoryToDelete))
+            }
+        }
+
+        setShowDeleteCategoryConfirm(false)
+        setCategoryToDelete(null)
     }
 
     return (
         <div className="bg-background-white min-h-screen p-4 md:p-6">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl md:text-3xl font-heading font-bold text-navy-blue">Courses Offered</h1>
-                <button
-                    className="bg-deep-blue text-white px-4 py-2 rounded-md hover:bg-navy-blue transition-colors flex items-center"
-                    onClick={handleAddCourse}>
-                    <FaPlus className="mr-2" /> Add Course
-                </button>
             </div>
 
             <div className="mb-8">
-                <h2 className="text-xl md:text-2xl font-heading font-semibold text-deep-blue mb-4 flex items-center">
-                    <HiOutlineAcademicCap className="mr-2" /> Course Categories
-                </h2>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl md:text-2xl font-heading font-semibold text-deep-blue flex items-center">
+                        <HiOutlineAcademicCap className="mr-2" /> Course Categories
+                    </h2>
+                    <button
+                        className="bg-deep-blue text-white px-4 py-2 rounded-md hover:bg-navy-blue transition-colors flex items-center"
+                        onClick={handleAddCategory}>
+                        <FaPlus className="mr-2" /> Add new category
+                    </button>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-lg shadow-md p-4 border border-border-light">
-                        <h3 className="text-lg font-heading font-semibold text-navy-blue mb-3 flex items-center">
-                            <FaGraduationCap className="mr-2 text-deep-blue" /> For Colleges
-                        </h3>
+                {categoryError && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        <p>{categoryError}</p>
+                    </div>
+                )}
+
+                <div className="bg-white rounded-lg shadow-md p-4 border border-border-light">
+                    {categories.length > 0 ? (
                         <ul className="space-y-2">
-                            {collegeCategories.map((category, index) => (
+                            {categories.map((category, index) => (
                                 <li
                                     key={index}
                                     className="rounded">
-                                    <button
-                                        className={`w-full p-2 rounded transition-colors flex items-center justify-between text-left cursor-pointer ${
-                                            selectedType === 'college' && selectedCategory === category
-                                                ? 'bg-navy-blue text-white'
-                                                : 'hover:bg-background-light'
-                                        }`}
-                                        onClick={() => {
-                                            setSelectedType('college')
-                                            setSelectedCategory(category)
-                                        }}>
-                                        <div className="flex items-center">
-                                            <div className="w-1 h-6 bg-gold mr-2"></div>
-                                            {category}
-                                        </div>
-                                        {selectedType === 'college' && selectedCategory === category && <FaCheck className="text-gold" />}
-                                    </button>
+                                    <div className="flex items-center justify-between">
+                                        <button
+                                            className={`flex-1 p-2 rounded transition-colors flex items-center justify-between text-left cursor-pointer ${
+                                                selectedCategories.includes(category) ? 'bg-navy-blue text-white' : 'hover:bg-background-light'
+                                            }`}
+                                            onClick={() => toggleCategorySelection(category)}>
+                                            <div className="flex items-center">
+                                                <div className="w-1 h-6 bg-gold mr-2"></div>
+                                                {category}
+                                            </div>
+                                            {selectedCategories.includes(category) && <FaCheck className="text-gold" />}
+                                        </button>
+                                        <button
+                                            className="ml-2 p-2 text-red-600 hover:bg-red-100 rounded-md transition-colors"
+                                            onClick={() => handleDeleteCategory(category)}
+                                            title="Delete Category">
+                                            <FaTrash size={14} />
+                                        </button>
+                                    </div>
                                 </li>
                             ))}
                         </ul>
-                    </div>
-
-                    <div className="bg-white rounded-lg shadow-md p-4 border border-border-light">
-                        <h3 className="text-lg font-heading font-semibold text-navy-blue mb-3 flex items-center">
-                            <FaSchool className="mr-2 text-deep-blue" /> For Schools
-                        </h3>
-                        <ul className="space-y-2">
-                            {schoolCategories.map((category, index) => (
-                                <li
-                                    key={index}
-                                    className="rounded">
-                                    <button
-                                        className={`w-full p-2 rounded transition-colors flex items-center justify-between text-left cursor-pointer ${
-                                            selectedType === 'school' && selectedCategory === category
-                                                ? 'bg-navy-blue text-white'
-                                                : 'hover:bg-background-light'
-                                        }`}
-                                        onClick={() => {
-                                            setSelectedType('school')
-                                            setSelectedCategory(category)
-                                        }}>
-                                        <div className="flex items-center">
-                                            <div className="w-1 h-6 bg-gold mr-2"></div>
-                                            {category}
-                                        </div>
-                                        {selectedType === 'school' && selectedCategory === category && <FaCheck className="text-gold" />}
-                                    </button>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                    ) : (
+                        <p className="text-center text-dark-gray py-4">No categories available. Add a new category to get started.</p>
+                    )}
                 </div>
             </div>
 
@@ -473,21 +490,16 @@ const CoursesOffered = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
 
-                        <select
-                            className={`border border-border-light rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-deep-blue ${
-                                selectedType !== 'all' ? 'bg-navy-blue text-white' : ''
-                            }`}
-                            value={selectedType}
-                            onChange={(e) => setSelectedType(e.target.value)}>
-                            <option value="all">All Types</option>
-                            <option value="college">College</option>
-                            <option value="school">School</option>
-                        </select>
-
                         <button
                             className="bg-deep-blue text-white px-4 py-2 rounded-md hover:bg-navy-blue transition-colors"
                             onClick={resetFilters}>
                             Reset Filters
+                        </button>
+
+                        <button
+                            className="bg-deep-blue text-white px-4 py-2 rounded-md hover:bg-navy-blue transition-colors flex items-center"
+                            onClick={handleAddCourse}>
+                            <FaPlus className="mr-2" /> Add Course
                         </button>
                     </div>
                 </div>
@@ -513,15 +525,11 @@ const CoursesOffered = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredCourses.map((course) => (
                             <div
-                                key={course.id}
+                                key={course._id}
                                 className="bg-white rounded-lg shadow-md overflow-hidden border border-border-light hover:shadow-lg transition-shadow">
                                 <div className="p-4">
                                     <div className="flex justify-between items-start mb-2">
-                                        <h3 className="text-lg font-heading font-semibold text-navy-blue">{course.name}</h3>
-                                        <span
-                                            className={`text-xs px-2 py-1 rounded-full ${course.type === 'college' ? 'bg-deep-blue text-white' : 'bg-gold text-black'}`}>
-                                            {course.type === 'college' ? 'College' : 'School'}
-                                        </span>
+                                        <h3 className="text-lg font-heading font-semibold text-navy-blue">{course.courseName}</h3>
                                     </div>
 
                                     <p className="text-sm text-dark-gray mb-3">{course.category}</p>
@@ -529,7 +537,7 @@ const CoursesOffered = () => {
                                     <div className="space-y-2 mb-4">
                                         <div className="flex items-center text-sm">
                                             <IoMdTime className="mr-2 text-deep-blue" />
-                                            <span>Duration: {course.duration}</span>
+                                            <span>Duration: {course.duration} months</span>
                                         </div>
                                         <div className="flex items-center text-sm">
                                             <FaAward className="mr-2 text-deep-blue" />
@@ -573,7 +581,7 @@ const CoursesOffered = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
                         <div className="sticky top-0 bg-navy-blue text-white p-4 flex justify-between items-center">
-                            <h3 className="text-xl font-heading font-semibold">{selectedCourse.name}</h3>
+                            <h3 className="text-xl font-heading font-semibold">{selectedCourse.courseName}</h3>
                             <div className="flex items-center gap-3">
                                 <button
                                     className="text-white hover:text-gold transition-colors"
@@ -601,7 +609,7 @@ const CoursesOffered = () => {
                                     <h4 className="font-heading font-semibold text-navy-blue mb-2 flex items-center">
                                         <IoMdTime className="mr-2" /> Duration
                                     </h4>
-                                    <p>{selectedCourse.duration}</p>
+                                    <p>{selectedCourse.duration} months</p>
                                 </div>
 
                                 <div className="bg-background-light p-4 rounded-lg">
@@ -624,9 +632,7 @@ const CoursesOffered = () => {
                                     <BsBook className="mr-2" /> Course Syllabus / Curriculum
                                 </h4>
                                 <ul className="list-disc pl-5 space-y-2">
-                                    {selectedCourse.syllabus.map((item, index) => (
-                                        <li key={index}>{item}</li>
-                                    ))}
+                                    {selectedCourse.syllabus && selectedCourse.syllabus.map((item, index) => <li key={index}>{item}</li>)}
                                 </ul>
                             </div>
 
@@ -634,7 +640,7 @@ const CoursesOffered = () => {
                                 <h4 className="font-heading font-semibold text-navy-blue mb-3 flex items-center">
                                     <MdOutlineAttachMoney className="mr-2" /> Fee Structure
                                 </h4>
-                                <p>{selectedCourse.fees}</p>
+                                <p>₹{selectedCourse.fees}</p>
                             </div>
 
                             <div className="mb-6">
@@ -649,29 +655,31 @@ const CoursesOffered = () => {
                                 <div className="space-y-2">
                                     <p className="flex items-center">
                                         <FaEnvelope className="mr-2 text-deep-blue" />
-                                        {selectedCourse.contactInfo.email}
+                                        {selectedCourse.email}
                                     </p>
                                     <p className="flex items-center">
                                         <FaPhone className="mr-2 text-deep-blue" />
-                                        {selectedCourse.contactInfo.phone}
+                                        {selectedCourse.phone}
                                     </p>
                                     <p className="flex items-center">
                                         <FaGlobe className="mr-2 text-deep-blue" />
-                                        {selectedCourse.contactInfo.website}
+                                        {selectedCourse.website}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row gap-4">
-                                <a
-                                    href={selectedCourse.brochureUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="flex-1 bg-deep-blue text-white py-3 rounded-md text-center hover:bg-navy-blue transition-colors flex items-center justify-center"
-                                    download={`${selectedCourse.name.replace(/\s+/g, '-').toLowerCase()}-brochure.pdf`}>
-                                    <FaDownload className="mr-2" /> Download Brochure
-                                </a>
-                            </div>
+                            {selectedCourse.brochure && (
+                                <div className="flex flex-col sm:flex-row gap-4">
+                                    <a
+                                        href={selectedCourse.brochure}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex-1 bg-deep-blue text-white py-3 rounded-md text-center hover:bg-navy-blue transition-colors flex items-center justify-center"
+                                        download={`${selectedCourse.courseName.replace(/\s+/g, '-').toLowerCase()}-brochure.pdf`}>
+                                        <FaDownload className="mr-2" /> Download Brochure
+                                    </a>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -712,24 +720,6 @@ const CoursesOffered = () => {
 
                                 <div>
                                     <label
-                                        htmlFor="courseType"
-                                        className="block text-navy-blue font-semibold mb-2">
-                                        Course Type
-                                    </label>
-                                    <select
-                                        id="courseType"
-                                        name="type"
-                                        value={formData.type}
-                                        onChange={handleInputChange}
-                                        className="w-full border border-border-light rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-deep-blue"
-                                        required>
-                                        <option value="college">College</option>
-                                        <option value="school">School</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label
                                         htmlFor="courseCategory"
                                         className="block text-navy-blue font-semibold mb-2">
                                         Category
@@ -742,42 +732,15 @@ const CoursesOffered = () => {
                                         className="w-full border border-border-light rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-deep-blue"
                                         required>
                                         <option value="">Select Category</option>
-                                        {formData.type === 'college'
-                                            ? collegeCategories.map((category, index) => (
-                                                  <option
-                                                      key={index}
-                                                      value={category}>
-                                                      {category}
-                                                  </option>
-                                              ))
-                                            : schoolCategories.map((category, index) => (
-                                                  <option
-                                                      key={index}
-                                                      value={category}>
-                                                      {category}
-                                                  </option>
-                                              ))}
-                                        <option value="new">+ Add New Category</option>
+                                        {categories.map((category, index) => (
+                                            <option
+                                                key={index}
+                                                value={category}>
+                                                {category}
+                                            </option>
+                                        ))}
                                     </select>
                                 </div>
-
-                                {formData.category === 'new' && (
-                                    <div>
-                                        <label
-                                            htmlFor="newCategory"
-                                            className="block text-navy-blue font-semibold mb-2">
-                                            New Category Name
-                                        </label>
-                                        <input
-                                            id="newCategory"
-                                            type="text"
-                                            name="newCategory"
-                                            className="w-full border border-border-light rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-deep-blue"
-                                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                )}
 
                                 <div>
                                     <label
@@ -1021,6 +984,79 @@ const CoursesOffered = () => {
                                     className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-opacity-90 transition-colors"
                                     onClick={handleDeleteCourse}>
                                     Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showCategoryForm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+                        <div className="p-6">
+                            <h3 className="text-xl font-heading font-semibold text-navy-blue mb-4">Add New Category</h3>
+
+                            <form onSubmit={handleCategoryFormSubmit}>
+                                <div className="mb-4">
+                                    <label
+                                        htmlFor="newCategoryName"
+                                        className="block text-navy-blue font-semibold mb-2">
+                                        Category Name
+                                    </label>
+                                    <input
+                                        id="newCategoryName"
+                                        type="text"
+                                        value={newCategoryName}
+                                        onChange={(e) => setNewCategoryName(e.target.value)}
+                                        className="w-full border border-border-light rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-deep-blue"
+                                        required
+                                    />
+                                </div>
+
+                                <div className="flex justify-end gap-3">
+                                    <button
+                                        type="button"
+                                        className="bg-light-gray text-dark-gray px-6 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+                                        onClick={() => setShowCategoryForm(false)}>
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="bg-deep-blue text-white px-6 py-2 rounded-md hover:bg-navy-blue transition-colors">
+                                        Add Category
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteCategoryConfirm && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+                        <div className="p-6">
+                            <div className="flex items-center text-red-600 mb-4">
+                                <BsExclamationTriangle className="text-3xl mr-3" />
+                                <h3 className="text-xl font-heading font-semibold">Confirm Category Deletion</h3>
+                            </div>
+
+                            <p className="mb-6">
+                                Are you sure you want to delete the category <strong>{categoryToDelete}</strong>? This will remove all courses
+                                associated with this category. This action cannot be undone.
+                            </p>
+
+                            <div className="flex justify-end gap-3">
+                                <button
+                                    className="bg-light-gray text-dark-gray px-6 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+                                    onClick={() => setShowDeleteCategoryConfirm(false)}>
+                                    Cancel
+                                </button>
+                                <button
+                                    className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-opacity-90 transition-colors"
+                                    onClick={confirmDeleteCategory}>
+                                    Delete Category
                                 </button>
                             </div>
                         </div>
