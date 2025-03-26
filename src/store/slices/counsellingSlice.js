@@ -195,6 +195,28 @@ export const CompleteCounsellingSession = createAsyncThunk('complete/counselling
     }
 })
 
+export const GetSessionsForDashboard = createAsyncThunk('getSessionsForDashboard/counselling', async (_, thunkAPI) => {
+    try {
+        const { data } = await api.get(`${serverURL}/${counsellingURL}/getSessionsForDashboard`)
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        return data
+
+    } catch (error) {
+        const errorMessage =
+            api.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    }
+})
+
 const counsellingSlice = createSlice({
     name: 'counselling',
     initialState,

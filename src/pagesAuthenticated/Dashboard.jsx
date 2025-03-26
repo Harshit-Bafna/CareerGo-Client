@@ -21,10 +21,13 @@ import counsellingDashboard from '../assets/counsellingDashboard.svg'
 import { useBtnNavigation } from '../utils/helper/syncHelper'
 import { useDispatch, useSelector } from 'react-redux'
 import { getBasicInfo } from '../store/slices/userSlice'
+import { GetSessionsForDashboard } from '../store/slices/counsellingSlice'
 
 const Dashboard = () => {
     const dispatch = useDispatch()
     const [setScrollPosition] = useState(0)
+    const [upcomingSessions, setUpcomingSessions] = useState([])
+    const [completedSessions, setCompletedSessions] = useState([])
 
     const { name, emailAddress, profileImage, userProfileProgress } = useSelector((state) => state.user)
     const [userData, setUserData] = useState({
@@ -59,68 +62,38 @@ const Dashboard = () => {
         fetchData()
     }, [dispatch, name, emailAddress])
 
-    const upcomingSessions = [
-        {
-            id: 1,
-            institution: 'VIT Bhopal',
-            purpose: 'Career Guidance',
-            date: '2025-02-14',
-            time: '11:57',
-            status: 'Pending',
-            meetingLink: 'https://meet.google.com/abc-defg-hij',
-        },
-        {
-            id: 2,
-            institution: 'IIT Bombay',
-            purpose: 'Admission Process',
-            date: '2025-02-18',
-            time: '14:30',
-            status: 'Upcoming',
-        },
-        {
-            id: 3,
-            institution: 'AIIMS Delhi',
-            purpose: 'Medical Counselling',
-            date: '2025-02-20',
-            time: '09:15',
-            status: 'Pending',
-        },
-        {
-            id: 4,
-            institution: 'NIT Trichy',
-            purpose: 'Scholarship Discussion',
-            date: '2025-02-22',
-            time: '16:00',
-            status: 'Upcoming',
-        },
-    ]
+    useEffect(() => {
+        const fetchSessions = async () => {
+            const response = await dispatch(GetSessionsForDashboard())
 
-    const completedSessions = [
-        {
-            id: 5,
-            institution: 'AIIMS Delhi',
-            purpose: 'Course Selection',
-            date: '2025-01-25',
-            time: '10:00',
-            status: 'Completed',
-        },
-        {
-            id: 6,
-            institution: 'IIM Ahmedabad',
-            purpose: 'MBA Orientation',
-            date: '2025-01-18',
-            time: '11:30',
-            status: 'Completed',
-        },
-        {
-            id: 7,
-            institution: 'BITS Pilani',
-            purpose: 'Campus Tour',
-            date: '2025-01-10',
-            time: '14:00',
-            status: 'Completed',
-        },
-    ]
+            if (response.payload && response.payload.data) {
+                const { upcomingSessions, completedSessions } = response.payload.data
+
+                const formattedUpcomingSessions = upcomingSessions.map((session) => ({
+                    id: session._id,
+                    institution: session.institutionId.institutionName,
+                    purpose: session.purpose,
+                    date: new Date(session.date).toISOString().split('T')[0],
+                    time: session.time,
+                    status: session.status === 'Approved' ? 'Upcoming' : session.status,
+                }))
+
+                const formattedCompletedSessions = completedSessions.map((session) => ({
+                    id: session._id,
+                    institution: session.institutionId.institutionName,
+                    purpose: session.purpose,
+                    date: new Date(session.date).toISOString().split('T')[0],
+                    time: session.time,
+                    status: session.status,
+                }))
+
+                setUpcomingSessions(formattedUpcomingSessions)
+                setCompletedSessions(formattedCompletedSessions)
+            }
+        }
+
+        fetchSessions()
+    }, [dispatch])
 
     const recommendedInstitutions = [
         {
@@ -198,17 +171,17 @@ const Dashboard = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'Upcoming':
-                return 'text-green-600'
-            case 'Pending':
-                return 'text-gold'
+                return 'bg-green-100 text-green-800 border-green-200'
+            case 'Approval Pending':
+                return 'bg-yellow-100 text-yellow-800 border-yellow-200'
             case 'Completed':
-                return 'text-deep-blue'
+                return 'bg-blue-100 text-blue-800 border-blue-200'
             case 'Rejected':
-                return 'text-red-600'
+                return 'bg-red-600'
             case 'Cancelled':
-                return 'text-red-600'
+                return 'bg-red-600'
             default:
-                return 'text-dark-gray'
+                return 'bg-dark-gray'
         }
     }
 
@@ -254,7 +227,7 @@ const Dashboard = () => {
                     </div>
                     <div className="md:w-1/2 flex justify-center">
                         <img
-                            src={counsellingDashboard}
+                            src={counsellingDashboard || '/placeholder.svg'}
                             alt="Career Counselling"
                             className="max-w-full h-auto max-h-48"
                         />
@@ -268,7 +241,7 @@ const Dashboard = () => {
                         <div className="relative mb-4">
                             {profileImage ? (
                                 <img
-                                    src={profileImage}
+                                    src={profileImage || '/placeholder.svg'}
                                     alt="Profile"
                                     className="w-24 h-24 rounded-full object-cover border-4 border-deep-blue"
                                 />
@@ -384,8 +357,9 @@ const Dashboard = () => {
                                                         <p className="text-sm text-dark-gray">{session.purpose}</p>
                                                     </div>
                                                 </div>
-                                                <span className={`capitalize text-sm font-medium ${getStatusColor(session.status)}`}>
-                                                    {session.status}
+                                                <span
+                                                    className={`capitalize text-sm font-medium py-0.5 rounded-full px-2 ml-3  ${getStatusColor(session.status)}`}>
+                                                    {session.status === 'Approval Pending' ? 'Pending' : session.status}
                                                 </span>
                                             </div>
 
@@ -460,7 +434,8 @@ const Dashboard = () => {
                                                         <p className="text-sm text-dark-gray">{session.purpose}</p>
                                                     </div>
                                                 </div>
-                                                <span className={`capitalize text-sm font-medium ${getStatusColor(session.status)}`}>
+                                                <span
+                                                    className={`capitalize text-sm font-medium py-0.5 rounded-full px-2 ml-3 ${getStatusColor(session.status)}`}>
                                                     {session.status}
                                                 </span>
                                             </div>
@@ -589,7 +564,7 @@ const Dashboard = () => {
                             <div className="relative mb-4">
                                 {profileImage ? (
                                     <img
-                                        src={profileImage}
+                                        src={profileImage || '/placeholder.svg'}
                                         alt="Profile"
                                         className="w-24 h-24 rounded-full object-cover border-4 border-deep-blue"
                                     />
