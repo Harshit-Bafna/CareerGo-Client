@@ -12,6 +12,7 @@ const initialState = {
     profileImage: null,
     role: null,
     institutionId: null,
+    userProfileProgress: null
 }
 
 export const selfIdentification = createAsyncThunk('user/selfIdentification', async (_, thunkAPI) => {
@@ -441,6 +442,7 @@ const userSlice = createSlice({
             state.profileImage = action.payload.data.profileImage
             state.role = action.payload.data.role
             state.institutionId = action.payload.data.institutionId
+            state.userProfileProgress = action.payload.data.userProfileProgress
         },
         clearUser: (state) => {
             state.userId = null
@@ -449,6 +451,7 @@ const userSlice = createSlice({
             state.profileImage = null
             state.role = null
             state.institutionId = null
+            state.userProfileProgress = null
         }
     },
     extraReducers: (builder) => {
@@ -459,6 +462,7 @@ const userSlice = createSlice({
             state.profileImage = action.payload.data.profileImage
             state.role = action.payload.data.role
             state.institutionId = action.payload.data.institutionId
+            state.userProfileProgress = action.payload.data.userProfileProgress
         })
 
     }

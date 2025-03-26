@@ -24,9 +24,9 @@ import { getBasicInfo } from '../store/slices/userSlice'
 
 const Dashboard = () => {
     const dispatch = useDispatch()
-    const [profileCompletion] = useState(65)
     const [setScrollPosition] = useState(0)
-    const { name, emailAddress, profileImage } = useSelector((state) => state.user)
+
+    const { name, emailAddress, profileImage, userProfileProgress } = useSelector((state) => state.user)
     const [userData, setUserData] = useState({
         name: '',
         email: '',
@@ -306,10 +306,10 @@ const Dashboard = () => {
                     <div className="w-full bg-light-gray rounded-full h-4">
                         <div
                             className="bg-deep-blue h-4 rounded-full"
-                            style={{ width: `${profileCompletion}%` }}></div>
+                            style={{ width: `${userProfileProgress}%` }}></div>
                     </div>
                     <div className="flex justify-between mt-2">
-                        <span className="text-sm text-text-secondary">{profileCompletion}% Completed</span>
+                        <span className="text-sm text-text-secondary">{userProfileProgress}% Completed</span>
                         <NavLink
                             to="/dashboard/userProfile"
                             className="text-sm text-deep-blue hover:underline">
@@ -627,10 +627,10 @@ const Dashboard = () => {
                         <div className="w-full bg-light-gray rounded-full h-4">
                             <div
                                 className="bg-deep-blue h-4 rounded-full"
-                                style={{ width: `${profileCompletion}%` }}></div>
+                                style={{ width: `${userProfileProgress}%` }}></div>
                         </div>
                         <div className="flex justify-between mt-2">
-                            <span className="text-sm text-text-secondary">{profileCompletion}% Completed</span>
+                            <span className="text-sm text-text-secondary">{userProfileProgress}% Completed</span>
                             <NavLink
                                 to="/dashboard/userProfile"
                                 className="text-sm text-deep-blue hover:underline">
