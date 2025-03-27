@@ -124,7 +124,7 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                         />
 
                         {activeDropdown === 'counselling' && isSidebarOpen && (
-                            <div className="pl-10 space-y-1 animate-fadeIn">
+                            <div className="pl-10 space-y-1 animate-fadeIn ">
                                 {counsellingItems.map((item, index) => (
                                     <SidebarItem
                                         key={index}

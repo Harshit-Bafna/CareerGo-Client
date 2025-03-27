@@ -1,4 +1,14 @@
-1. BasicInfo section of userProfile is sending all fields to the backend even updating a single field.
-2. remove success response message from slices
-3. view details page
+1. route hiding
+2. 
+3. view details page of institution recommendation
 4. userProfileProgress calculations (dynamic)
+5. fix error messages in backend
+6. backend email template 
+7. You will receive a confirmation email once your request is approved (backend work)
+8. sidebar dropdown navigation not working 
+9. edit couse btn does not fetch full details in institution profile page 
+10. unable to add Achievements in profile
+11. Certification save bottom wrong response message
+12. Certification delete should ask for confirm delete
+13. education deletion alert not looking good
+14. 

@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { startLoading, stopLoading } from "./loaderSlice"
 import { setError } from "./errorSlice"
+import { setSuccess } from "./messageSlice"
+import successMessage from "../../utils/constants/successMessage"
 import api from "../../utils/services/api"
 
 const institutionURL = 'api/v1/institution'
@@ -43,6 +45,8 @@ export const updateInstitutionDetails = createAsyncThunk('institution/updateDeta
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.updateInstitutionDetails))
 
         return data
 
@@ -118,6 +122,8 @@ export const createCourseCategory = createAsyncThunk('institution/createCourseCa
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.createCourseCategory))
+
         return data
 
     } catch (error) {
@@ -170,6 +176,8 @@ export const deleteCourseCategory = createAsyncThunk('institution/deleteCourseCa
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.deleteCourseCategory))
+
         return data
 
     } catch (error) {
@@ -195,6 +203,8 @@ export const createCourse = createAsyncThunk('institution/createCourse', async (
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.createCourse))
 
         return data
 
@@ -270,6 +280,8 @@ export const updateCourseDetails = createAsyncThunk('institution/updateCourseDet
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.updateCourse))
+
         return data
 
     } catch (error) {
@@ -295,6 +307,8 @@ export const deteleCourse = createAsyncThunk('institution/deteleCourse', async (
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.deleteCourse))
 
         return data
 

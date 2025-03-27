@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { startLoading, stopLoading } from "./loaderSlice"
 import { setError } from "./errorSlice"
+import { setSuccess } from "./messageSlice"
+import successMessage from "../../utils/constants/successMessage"
 import api from "../../utils/services/api"
 
 const userURL = 'api/v1/user'
@@ -52,6 +54,8 @@ export const updateBasicInfo = createAsyncThunk('user/updateBasicInfo', async (P
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.updateBasicInfo))
+
         return data
 
     } catch (error) {
@@ -69,8 +73,6 @@ export const updateBasicInfo = createAsyncThunk('user/updateBasicInfo', async (P
 
 export const getBasicInfo = createAsyncThunk('user/getBasicInfo', async (_, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.get(`/${userURL}/basicInfo`)
 
         if (!data.success) {
@@ -88,8 +90,6 @@ export const getBasicInfo = createAsyncThunk('user/getBasicInfo', async (_, thun
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
     }
 })
 
@@ -103,6 +103,8 @@ export const createAchievement = createAsyncThunk('user/createAchievement', asyn
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.createAchievement))
 
         return data
 
@@ -121,8 +123,6 @@ export const createAchievement = createAsyncThunk('user/createAchievement', asyn
 
 export const getAchievements = createAsyncThunk('user/getAchievements', async (_, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.get(`/${userURL}/achievement`)
 
         if (!data.success) {
@@ -140,21 +140,19 @@ export const getAchievements = createAsyncThunk('user/getAchievements', async (_
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
-    }
+    } 
 })
 
 export const updateAchievement = createAsyncThunk('user/updateAchievement', async (Payload, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.put(`/${userURL}/achievement/${Payload.achievementId}`, Payload)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.updateAchievement))
 
         return data
 
@@ -166,8 +164,6 @@ export const updateAchievement = createAsyncThunk('user/updateAchievement', asyn
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
     }
 })
 
@@ -181,6 +177,8 @@ export const deleteAchievement = createAsyncThunk('user/deleteAchievement', asyn
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.deleteAchievement))
 
         return data
 
@@ -208,6 +206,8 @@ export const createCertification = createAsyncThunk('user/createCertification', 
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.createCertification))
+
         return data
 
     } catch (error) {
@@ -225,8 +225,6 @@ export const createCertification = createAsyncThunk('user/createCertification', 
 
 export const getCertification = createAsyncThunk('user/getCertification', async (_, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.get(`/${userURL}/certification`)
 
         if (!data.success) {
@@ -244,9 +242,7 @@ export const getCertification = createAsyncThunk('user/getCertification', async 
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
-    }
+    } 
 })
 
 export const updateCertification = createAsyncThunk('user/updateCertification', async (Payload, thunkAPI) => {
@@ -259,6 +255,8 @@ export const updateCertification = createAsyncThunk('user/updateCertification', 
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.updateCertification))
 
         return data
 
@@ -286,6 +284,8 @@ export const deleteCertification = createAsyncThunk('user/deleteCertification', 
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.deleteCertification))
+
         return data
 
     } catch (error) {
@@ -312,6 +312,8 @@ export const createEducation = createAsyncThunk('user/createEducation', async (P
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.createEducation))
+
         return data
 
     } catch (error) {
@@ -325,12 +327,10 @@ export const createEducation = createAsyncThunk('user/createEducation', async (P
     } finally {
         thunkAPI.dispatch(stopLoading())
     }
-})
+}) 
 
 export const getEducation = createAsyncThunk('user/getEducation', async (_, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.get(`/${userURL}/education`)
 
         if (!data.success) {
@@ -348,9 +348,7 @@ export const getEducation = createAsyncThunk('user/getEducation', async (_, thun
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
-    }
+    } 
 })
 
 export const updateEducation = createAsyncThunk('user/updateEducation', async (Payload, thunkAPI) => {
@@ -363,6 +361,8 @@ export const updateEducation = createAsyncThunk('user/updateEducation', async (P
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
+
+        thunkAPI.dispatch(setSuccess(successMessage.updateEducation))
 
         return data
 
@@ -390,6 +390,8 @@ export const deleteEducation = createAsyncThunk('user/deleteEducation', async (P
             return thunkAPI.rejectWithValue(data.message)
         }
 
+        thunkAPI.dispatch(setSuccess(successMessage.deleteEducation))
+
         return data
 
     } catch (error) {
@@ -407,8 +409,6 @@ export const deleteEducation = createAsyncThunk('user/deleteEducation', async (P
 
 export const updateProfileImage = createAsyncThunk('user/updateProfileImage', async (Payload, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.put(`/${userURL}/profileImage`, Payload)
 
         if (!data.success) {
@@ -426,8 +426,6 @@ export const updateProfileImage = createAsyncThunk('user/updateProfileImage', as
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
     }
 })
 
