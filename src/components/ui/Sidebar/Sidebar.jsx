@@ -1,18 +1,22 @@
 import { useState, useRef, useEffect } from 'react'
-import { FaBookOpen, FaUser, FaLightbulb, FaLock, FaHeadset } from 'react-icons/fa'
 import { LuListCollapse } from 'react-icons/lu'
 import { IoIosArrowDown } from 'react-icons/io'
-import { BiSolidInstitution } from 'react-icons/bi'
-import { MdSpaceDashboard } from 'react-icons/md'
 import { NavLink } from 'react-router-dom'
-import logo from '../../assets/logo.png'
-import logoIcon from '../../assets/logoIcon.png'
+import logo from '../../../assets/logo.png'
+import logoIcon from '../../../assets/logoIcon.png'
+import { UserMenu } from './UserMenu'
+import { InstitutionMenu } from './InstitutionMenu'
+import { useSelector } from 'react-redux'
 
 export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     const [activeDropdown, setActiveDropdown] = useState(null)
     const [popoverPosition, setPopoverPosition] = useState({ top: 0, visible: false })
     const [popoverContent, setPopoverContent] = useState([])
     const dropdownRef = useRef(null)
+
+    const { role } = useSelector((state) => state.user)
+
+    const menuItems = role === 'Organisation Admin' ? InstitutionMenu : UserMenu
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -40,16 +44,6 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
         }
     }
 
-    const profileItems = [
-        { to: '/dashboard/userProfile', icon: <FaUser />, text: 'Profile' },
-        { to: '/dashboard/changePassword', icon: <FaLock />, text: 'Change Password' },
-    ]
-
-    const counsellingItems = [
-        { to: '/dashboard/bookCounselling', icon: <FaBookOpen />, text: 'Book Counselling' },
-        { to: '/dashboard/counselling', icon: <FaLock />, text: 'View Counselling' },
-    ]
-
     return (
         <div className="relative">
             <div
@@ -68,83 +62,44 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                     className="flex-1 overflow-y-auto pb-4 px-3"
                     ref={dropdownRef}>
                     <div className="space-y-1">
-                        <SidebarItem
-                            to="/dashboard"
-                            icon={<MdSpaceDashboard className="text-lg" />}
-                            text="Dashboard"
-                            isSidebarOpen={isSidebarOpen}
-                            isActive={location.pathname === '/dashboard'}
-                        />
-
-                        <SidebarDropdownTrigger
-                            icon={<FaUser className="text-lg" />}
-                            text="User Profile"
-                            isOpen={activeDropdown === 'profile'}
-                            isSidebarOpen={isSidebarOpen}
-                            onClick={(e) => toggleDropdown('profile', profileItems, e)}
-                        />
-
-                        {activeDropdown === 'profile' && isSidebarOpen && (
-                            <div className="pl-10 space-y-1 animate-fadeIn">
-                                {profileItems.map((item, index) => (
+                        {menuItems.map((item, index) => (
+                            <div key={index}>
+                                {item.type === 'item' ? (
                                     <SidebarItem
-                                        key={index}
                                         to={item.to}
                                         icon={item.icon}
                                         text={item.text}
                                         isSidebarOpen={isSidebarOpen}
                                         isActive={location.pathname === item.to}
                                     />
-                                ))}
+                                ) : (
+                                    <>
+                                        <SidebarDropdownTrigger
+                                            icon={item.icon}
+                                            text={item.text}
+                                            isOpen={activeDropdown === item.id}
+                                            isSidebarOpen={isSidebarOpen}
+                                            onClick={(e) => toggleDropdown(item.id, item.items, e)}
+                                        />
+
+                                        {activeDropdown === item.id && isSidebarOpen && (
+                                            <div className="pl-10 space-y-1 animate-fadeIn">
+                                                {item.items.map((subItem, subIndex) => (
+                                                    <SidebarItem
+                                                        key={subIndex}
+                                                        to={subItem.to}
+                                                        icon={subItem.icon}
+                                                        text={subItem.text}
+                                                        isSidebarOpen={isSidebarOpen}
+                                                        isActive={location.pathname === subItem.to}
+                                                    />
+                                                ))}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
                             </div>
-                        )}
-
-                        <SidebarItem
-                            to="/dashboard/institutionProfile"
-                            icon={<BiSolidInstitution className="text-lg" />}
-                            text="Institution Profile"
-                            isSidebarOpen={isSidebarOpen}
-                            isActive={location.pathname === '/dashboard/institutionProfile'}
-                        />
-
-                        <SidebarItem
-                            to="/dashboard/recommendations"
-                            icon={<FaLightbulb className="text-lg" />}
-                            text="Recommendations"
-                            isSidebarOpen={isSidebarOpen}
-                            isActive={location.pathname === '/dashboard/recommendations'}
-                        />
-
-                        <SidebarDropdownTrigger
-                            icon={<FaBookOpen className="text-lg" />}
-                            text="Counselling"
-                            isOpen={activeDropdown === 'counselling'}
-                            isSidebarOpen={isSidebarOpen}
-                            onClick={(e) => toggleDropdown('counselling', counsellingItems, e)}
-                        />
-
-                        {activeDropdown === 'counselling' && isSidebarOpen && (
-                            <div className="pl-10 space-y-1 animate-fadeIn ">
-                                {counsellingItems.map((item, index) => (
-                                    <SidebarItem
-                                        key={index}
-                                        to={item.to}
-                                        icon={item.icon}
-                                        text={item.text}
-                                        isSidebarOpen={isSidebarOpen}
-                                        isActive={location.pathname === item.to}
-                                    />
-                                ))}
-                            </div>
-                        )}
-
-                        <SidebarItem
-                            to="/dashboard/support"
-                            icon={<FaHeadset className="text-lg" />}
-                            text="Support"
-                            isSidebarOpen={isSidebarOpen}
-                            isActive={location.pathname === '/dashboard/support'}
-                        />
+                        ))}
                     </div>
                 </nav>
 

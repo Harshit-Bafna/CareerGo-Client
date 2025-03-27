@@ -1,21 +1,11 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
 import { forgetPassword, ResendVerifyEmailLink } from '../store/slices/authSlice'
 
 export default function SentEmail() {
     const location = useLocation()
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    const { isLoggedIn } = useSelector((state) => state.auth)
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/dashboard')
-        }
-
-    }, [isLoggedIn, navigate])
 
     const email = location.state.EmailAddress
     const SentEmailMessage = location.state?.SentEmailMessage
@@ -51,8 +41,6 @@ export default function SentEmail() {
         return () => clearInterval(interval)
     }, [timer])
 
-    if (isLoggedIn) return null
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
             <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center">
@@ -60,7 +48,7 @@ export default function SentEmail() {
                 <p className="text-gray-600 mt-2">
                     We have sent you an email. Please check your inbox and follow the instructions {SentEmailMessage}.
                 </p>
-                <p className="text-gray-500 text-sm mt-2">Didn’t receive the email? Check your spam folder or resend it below.</p>
+                <p className="text-gray-500 text-sm mt-2">Didn&apos;t receive the email? Check your spam folder or resend it below.</p>
                 <button
                     onClick={handleClick}
                     disabled={isDisabled}

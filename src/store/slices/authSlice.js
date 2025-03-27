@@ -6,6 +6,7 @@ import successMessage from "../../utils/constants/successMessage"
 import axios from "axios"
 import config from "../../data/config"
 import { selfIdentification } from "./userSlice"
+import api from "../../utils/services/api"
 
 const serverURL = config.SERVER_URL
 const authURL = 'api/v1/auth'
@@ -97,8 +98,6 @@ export const userLogin = createAsyncThunk('auth/login', async (loginPayload, thu
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
     }
 })
 
@@ -106,7 +105,7 @@ export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) =>
     try {
         thunkAPI.dispatch(startLoading())
 
-        const { data } = await axios.put(`${serverURL}/${authURL}/logout`, { withCredentials: true })
+        const { data } = await api.put(`/${authURL}/logout`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
@@ -118,7 +117,7 @@ export const userLogout = createAsyncThunk('auth/logout', async (_, thunkAPI) =>
         return data
     } catch (error) {
         const errorMessage =
-            axios.isAxiosError(error) && error.response?.data?.message
+            api.isAxiosError(error) && error.response?.data?.message
                 ? error.response.data.message
                 : 'Something went wrong'
 
@@ -289,7 +288,14 @@ export const refreshToken = createAsyncThunk('auth/refreshToken', async (_, thun
 const authSlice = createSlice({
     name: 'auth',
     initialState,
-    reducers: {},
+    reducers: {
+        setLoggedIn: (state) => {
+            state.isLoggedIn = true
+        },
+        setLoggedOut: (state) => {
+            state.isLoggedIn = false
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(userLogin.pending, (state) => {
@@ -308,5 +314,7 @@ const authSlice = createSlice({
             })
     },
 })
+
+export const { setLoggedIn, setLoggedOut } = authSlice.actions
 
 export default authSlice.reducer

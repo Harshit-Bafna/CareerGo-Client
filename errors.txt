@@ -1,5 +1,5 @@
 1. route hiding
-2. 
+2. page not found for authnticated pages
 3. view details page of institution recommendation
 4. userProfileProgress calculations (dynamic)
 5. fix error messages in backend

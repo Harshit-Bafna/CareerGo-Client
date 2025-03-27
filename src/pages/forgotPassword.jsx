@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { setError } from '../store/slices/errorSlice'
 import { forgetPassword } from '../store/slices/authSlice'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { validateEmail } from '../utils/helper/syncHelper'
 import logo from '../assets/logo.png'
@@ -10,15 +10,6 @@ import forgotPasswordImg from '../assets/forgotPassword.svg'
 const ForgotPassword = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
-    const { isLoggedIn } = useSelector((state) => state.auth)
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/dashboard')
-        }
-
-    }, [isLoggedIn, navigate])
 
     const [email, setEmail] = useState('')
 
@@ -45,8 +36,6 @@ const ForgotPassword = () => {
             navigate('/sentEmail', { state: { SentEmailMessage: 'to reset your password', EmailAddress: email, IsForgotPassword: true } })
         }
     }
-
-    if (isLoggedIn) return null
 
     return (
         <div className="flex flex-col md:flex-row h-screen items-center justify-center p-6 md:p-0">
