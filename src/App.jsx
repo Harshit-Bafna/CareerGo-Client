@@ -6,10 +6,14 @@ import { clearSuccess } from './store/slices/messageSlice'
 import { selfIdentification } from './store/slices/userSlice'
 import Message from './components/Message'
 import Loader from './components/Loader'
-import { Router } from './Router'
+import { UserRouter } from './Router/UserRouter'
+import { UnauthRouter } from './Router/UnauthRouter'
+import { InstitutionRouter } from './Router/InstitutionRouter'
 import { RouterProvider } from 'react-router-dom'
 
 function App() {
+    const { isLoggedIn } = useSelector((state) => state.auth)
+    const { role } = useSelector((state) => state.user)
     const { isError, errorMessage } = useSelector((state) => state.error)
     const { isSuccess, successMessage } = useSelector((state) => state.success)
     const { isLoading } = useSelector((state) => state.loader)
@@ -36,6 +40,8 @@ function App() {
             return () => clearTimeout(timer)
         }
     }, [isSuccess, dispatch])
+
+    const Router = isLoggedIn ? (role === 'Organisation Admin' ? InstitutionRouter : UserRouter) : UnauthRouter
 
     return (
         <>

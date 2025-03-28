@@ -1,7 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import { setError } from "./errorSlice"
-import { setSuccess } from "./messageSlice"
-import successMessage from "../../utils/constants/successMessage"
 import config from "../../data/config"
 import api from "../../utils/services/api"
 
@@ -18,8 +16,6 @@ export const InstitutionsRecommendation = createAsyncThunk('recommendations', as
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
-
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
 
         return data
 

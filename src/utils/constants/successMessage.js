@@ -8,5 +8,30 @@ export default {
     userUpdatePassword: 'Password updated successfully',
     userVerifyEmail: 'Email verified successfully',
     userResendVerificationEmail: 'Verification email sent successfully',
-    userChangePassword: 'Password changes successfully'
+    userChangePassword: 'Password changes successfully',
+
+    bookCounsellingSession: 'Session booked successfully',
+    reschdeuleCounsellingSession: 'Session rescheduled successfully',
+    cancelCounsellingSession: 'Session cancelled successfully',
+    completedCounsellingSession: 'Session completed successfully',
+    approvedCounsellingSession: 'Session approved successfully',
+    rejectedCounsellingSession: 'Session rejected successfully',
+
+    updateInstitutionDetails: 'Details updated successfully',
+    createCourseCategory: 'Course category created successfully',
+    deleteCourseCategory: 'Course category deleted successfully',
+    createCourse: 'Course created successfully',
+    deleteCourse: 'Course deleted successfully',
+    updateCourse: 'Course updated successfully',
+
+    updateBasicInfo: 'Basic information updated successfully',
+    createAchievement: 'Achievement created successfully',
+    updateAchievement: 'Achievement updated successfully',
+    deleteAchievement: 'Achievement deleted successfully',
+    createCertification: 'Certification created successfully',
+    updateCertification: 'Certification updated successfully',
+    deleteCertification: 'Certification deleted successfully',
+    createEducation: 'Education created successfully',
+    updateEducation: 'Education updated successfully',
+    deleteEducation: 'Education deleted successfully',
 }

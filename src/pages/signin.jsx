@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { setError } from '../store/slices/errorSlice'
 import { userLogin } from '../store/slices/authSlice'
 import { validateEmail } from '../utils/helper/syncHelper'
@@ -7,18 +7,11 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 import signin_img from '../assets/signin.svg'
 import logo from '../assets/logo.png'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { stopLoading } from '../store/slices/loaderSlice'
 
 const Signin = () => {
     const dispatch = useDispatch()
     const navigate = useNavigate()
-
-    const { isLoggedIn } = useSelector((state) => state.auth)
-
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigate('/dashboard')
-        }
-    }, [isLoggedIn, navigate])
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -50,10 +43,10 @@ const Signin = () => {
 
         if (response.meta.requestStatus === 'fulfilled') {
             navigate('/dashboard')
+            window.location.reload()
         }
+        stopLoading()
     }
-
-    if (isLoggedIn) return null
 
     return (
         <section className="h-screen flex flex-col md:flex-row justify-center space-y-10 md:space-y-0 md:space-x-20 items-center md:mx-0 md:my-0">

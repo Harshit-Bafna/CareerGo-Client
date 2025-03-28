@@ -1,20 +1,13 @@
 import { useState, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Topbar from '../components/ui/Topbar'
-import Sidebar from '../components/ui/Sidebar'
+import Sidebar from '../components/ui/Sidebar/Sidebar'
 
 const RootLayout = () => {
-    const navigate = useNavigate()
     const { isLoggedIn } = useSelector((state) => state.auth)
     const [isSidebarOpen, setSidebarOpen] = useState(true)
     const [isTopbarDropdownOpen, setTopbarDropdownOpen] = useState(false)
-
-    useEffect(() => {
-        if (!isLoggedIn) {
-            navigate('/')
-        }
-    }, [isLoggedIn, navigate])
 
     useEffect(() => {
         const handleResize = () => {

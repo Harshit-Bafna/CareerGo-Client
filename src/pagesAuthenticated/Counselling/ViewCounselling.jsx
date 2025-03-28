@@ -65,41 +65,31 @@ const ViewCounselling = () => {
         message: '',
     })
 
-    const statusMapping = {
-        'Approval Pending': 'Upcoming',
-        Approved: 'Upcoming',
-        Scheduled: 'Upcoming',
-        Rejected: 'Rejected',
-        Cancelled: 'Cancelled',
-        Completed: 'Completed',
-    }
-
-    const fetchSessions = async (tabStatus = '') => {
+    const fetchSessions = async () => {
         setIsLoading(true)
         try {
-            const params = { status: tabStatus || '' }
-
-            if (role === EUserRole.Institution_ADMIN) {
-                params.institutionId = institutionId
-                params.userId = ''
-            } else {
-                params.userId = userId
-                params.institutionId = ''
+            const categorizedSessions = {
+                Upcoming: [],
+                Cancelled: [],
+                Rejected: [],
+                Completed: [],
             }
 
-            const response = await dispatch(GetCounsellingSessions(params)).unwrap()
+            for (const status of Object.keys(categorizedSessions)) {
+                const params = { status }
 
-            if (response.success) {
-                const categorizedSessions = {
-                    Upcoming: [],
-                    Cancelled: [],
-                    Rejected: [],
-                    Completed: [],
+                if (role === EUserRole.Institution_ADMIN) {
+                    params.institutionId = institutionId
+                    params.userId = ''
+                } else {
+                    params.userId = userId
+                    params.institutionId = ''
                 }
 
-                response.data.forEach((session) => {
-                    const category = statusMapping[session.status] || 'Upcoming'
-                    categorizedSessions[category].push({
+                const response = await dispatch(GetCounsellingSessions(params)).unwrap()
+
+                if (response.success) {
+                    categorizedSessions[status] = response.data.map((session) => ({
                         id: session._id,
                         userId: session.userId?._id,
                         userName: session.userId?.name,
@@ -115,11 +105,11 @@ const ViewCounselling = () => {
                         diApprovalReason: session.diApprovalReason,
                         createdAt: session.createdAt,
                         updatedAt: session.updatedAt,
-                    })
-                })
-
-                setSessions(categorizedSessions)
+                    }))
+                }
             }
+
+            setSessions(categorizedSessions)
         } finally {
             setIsLoading(false)
         }
@@ -173,6 +163,7 @@ const ViewCounselling = () => {
                 Payload: {
                     newDate: rescheduleData.newDate,
                     newTime: rescheduleData.newTime,
+                    status: 'Approval Pending',
                 },
             }
 
@@ -286,16 +277,28 @@ const ViewCounselling = () => {
         const actions = []
         const isPastSession = isSessionDatePassed(session.date, session.time)
 
-        if (role === EUserRole.Institution_ADMIN) {
-            if (['Approval Pending', 'Approved'].includes(session.status) && !isPastSession) {
-                actions.push({
-                    label: 'Reschedule',
-                    icon: <FaRegCalendarAlt className="text-xs" />,
-                    onClick: () => handleRescheduleClick(session),
-                    className: 'border-deep-blue text-deep-blue hover:bg-deep-blue hover:text-white',
-                })
-            }
+        const isWithin24Hours = () => {
+            const sessionDate = new Date(session.date)
+            const [hours, minutes] = session.time.split(':').map(Number)
+            sessionDate.setHours(hours, minutes, 0, 0)
 
+            const now = new Date()
+            const timeDiff = sessionDate.getTime() - now.getTime()
+            const hoursDiff = timeDiff / (1000 * 60 * 60)
+
+            return hoursDiff <= 24
+        }
+
+        if (!['Rejected', 'Cancelled'].includes(session.status) && !isPastSession && !isWithin24Hours()) {
+            actions.push({
+                label: 'Reschedule',
+                icon: <FaRegCalendarAlt className="text-xs" />,
+                onClick: () => handleRescheduleClick(session),
+                className: 'border-deep-blue text-deep-blue hover:bg-deep-blue hover:text-white',
+            })
+        }
+
+        if (role === EUserRole.Institution_ADMIN) {
             if (session.status !== 'Completed') {
                 if (session.status === 'Approval Pending') {
                     actions.push({
@@ -323,22 +326,13 @@ const ViewCounselling = () => {
                 })
             }
         } else {
-            if (['Approval Pending', 'Approved'].includes(session.status) && !isPastSession) {
+            if (session.status === 'Approval Pending') {
                 actions.push({
-                    label: 'Reschedule',
-                    icon: <FaRegCalendarAlt className="text-xs" />,
-                    onClick: () => handleRescheduleClick(session),
-                    className: 'border-deep-blue text-deep-blue hover:bg-deep-blue hover:text-white',
+                    label: 'Cancel',
+                    icon: <MdCancel className="text-xs" />,
+                    onClick: () => handleCancelClick(session),
+                    className: 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white',
                 })
-
-                if (session.status === 'Approval Pending') {
-                    actions.push({
-                        label: 'Cancel',
-                        icon: <MdCancel className="text-xs" />,
-                        onClick: () => handleCancelClick(session),
-                        className: 'border-red-500 text-red-500 hover:bg-red-500 hover:text-white',
-                    })
-                }
             }
         }
 

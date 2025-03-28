@@ -22,7 +22,7 @@ export const BookNewCounsellingSession = createAsyncThunk('book/counselling', as
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
+        thunkAPI.dispatch(setSuccess(successMessage.bookCounsellingSession))
 
         return data
 
@@ -41,16 +41,12 @@ export const BookNewCounsellingSession = createAsyncThunk('book/counselling', as
 
 export const GetCounsellingSessions = createAsyncThunk('get/counselling', async ({ userId, institutionId, status }, thunkAPI) => {
     try {
-        thunkAPI.dispatch(startLoading())
-
         const { data } = await api.get(`${serverURL}/${counsellingURL}?userId=${userId}&institutionId=${institutionId}&status=${status}`)
 
         if (!data.success) {
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
-
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
 
         return data
 
@@ -62,8 +58,6 @@ export const GetCounsellingSessions = createAsyncThunk('get/counselling', async 
 
         thunkAPI.dispatch(setError(errorMessage))
         return thunkAPI.rejectWithValue(errorMessage)
-    } finally {
-        thunkAPI.dispatch(stopLoading())
     }
 })
 
@@ -77,8 +71,6 @@ export const GetBookedDates = createAsyncThunk('getBookedDates/counselling', asy
             thunkAPI.dispatch(setError(data.message))
             return thunkAPI.rejectWithValue(data.message)
         }
-
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
 
         return data
 
@@ -105,7 +97,11 @@ export const ApproveOrRejectCounsellingSession = createAsyncThunk('approveOrReje
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
+        if (data.data.isApproved) {
+            thunkAPI.dispatch(setSuccess(successMessage.approvedCounsellingSession))
+        } else {
+            thunkAPI.dispatch(setSuccess(successMessage.rejectedCounsellingSession))
+        }
 
         return data
 
@@ -130,7 +126,7 @@ export const RescheduleCounsellingSession = createAsyncThunk('reschedule/counsel
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
+        thunkAPI.dispatch(setSuccess(successMessage.reschdeuleCounsellingSession))
 
         return data
 
@@ -155,7 +151,7 @@ export const CancelCounsellingSession = createAsyncThunk('cancel/counselling', a
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
+        thunkAPI.dispatch(setSuccess(successMessage.cancelCounsellingSession))
 
         return data
 
@@ -180,7 +176,7 @@ export const CompleteCounsellingSession = createAsyncThunk('complete/counselling
             return thunkAPI.rejectWithValue(data.message)
         }
 
-        thunkAPI.dispatch(setSuccess(successMessage.userRegister))
+        thunkAPI.dispatch(setSuccess(successMessage.completedCounsellingSession))
 
         return data
 

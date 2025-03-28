@@ -6,7 +6,7 @@ import CoursesOffered from './CoursesOffered'
 import { getInstitutionDetails, updateInstitutionDetails, updateInstitutionLogo } from '../../store/slices/institutionSlice'
 import { uploadToAWS } from '../../store/slices/awsSlice'
 
-const InputField = ({ name, value, onChange, className = '', disabled = false }) => {
+const InputField = ({ name, value, onChange, className = '', disabled = false, placeholder }) => {
     return (
         <input
             type="text"
@@ -14,6 +14,7 @@ const InputField = ({ name, value, onChange, className = '', disabled = false })
             value={value}
             onChange={onChange}
             disabled={disabled}
+            placeholder={placeholder}
             className={`border border-gray-300 rounded-md p-2 w-full ${disabled ? 'bg-gray-200 cursor-not-allowed' : ''} ${className}`}
         />
     )
@@ -191,6 +192,7 @@ const InstitutionProfile = () => {
                                         <InputField
                                             name="website"
                                             value={institutionData.website}
+                                            placeholder="Website url"
                                             onChange={handleChange}
                                         />
                                         <div className="mt-2">
