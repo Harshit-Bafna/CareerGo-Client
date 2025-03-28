@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { LuListCollapse } from 'react-icons/lu'
 import { IoIosArrowDown } from 'react-icons/io'
 import { NavLink } from 'react-router-dom'
@@ -10,37 +10,15 @@ import { useSelector } from 'react-redux'
 
 export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
     const [activeDropdown, setActiveDropdown] = useState(null)
-    const [popoverPosition, setPopoverPosition] = useState({ top: 0, visible: false })
-    const [popoverContent, setPopoverContent] = useState([])
     const dropdownRef = useRef(null)
 
     const { role } = useSelector((state) => state.user)
 
     const menuItems = role === 'Organisation Admin' ? InstitutionMenu : UserMenu
 
-    useEffect(() => {
-        function handleClickOutside(event) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setActiveDropdown(null)
-                setPopoverPosition({ ...popoverPosition, visible: false })
-            }
-        }
-
-        document.addEventListener('mousedown', handleClickOutside)
-        return () => document.removeEventListener('mousedown', handleClickOutside)
-    }, [popoverPosition])
-
-    const toggleDropdown = (dropdownName, items, e) => {
+    const toggleDropdown = (dropdownName) => {
         if (isSidebarOpen) {
             setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName)
-            setPopoverPosition({ ...popoverPosition, visible: false })
-        } else {
-            const rect = e.currentTarget.getBoundingClientRect()
-            setPopoverContent(items)
-            setPopoverPosition({
-                top: rect.top,
-                visible: true,
-            })
         }
     }
 
@@ -112,27 +90,6 @@ export default function Sidebar({ isSidebarOpen, setSidebarOpen }) {
                     </button>
                 </div>
             </div>
-
-            {popoverPosition.visible && !isSidebarOpen && (
-                <div
-                    className="fixed z-50 left-20 bg-deep-indigo rounded-md shadow-lg py-2 w-48 animate-fadeIn"
-                    style={{ top: popoverPosition.top - 10 }}>
-                    {popoverContent.map((item, index) => (
-                        <NavLink
-                            key={index}
-                            to={item.to}
-                            className={({ isActive }) =>
-                                `flex items-center px-4 py-2 text-white hover:bg-background-accent/10 transition-colors ${
-                                    isActive ? 'bg-background-accent/20 font-medium' : ''
-                                }`
-                            }
-                            onClick={() => setPopoverPosition({ ...popoverPosition, visible: false })}>
-                            <span className="mr-3">{item.icon}</span>
-                            <span>{item.text}</span>
-                        </NavLink>
-                    ))}
-                </div>
-            )}
         </div>
     )
 }
@@ -164,7 +121,7 @@ const SidebarItem = ({ to, icon, text, isSidebarOpen }) => {
 
             {tooltip.visible && !isSidebarOpen && (
                 <div
-                    className="fixed z-50 left-20 bg-navy-blue text-white px-4 py-2 rounded-md shadow-lg text-sm animate-fadeIn"
+                    className="fixed z-50 left-20 bg-white text-dark-gray px-4 py-2 rounded-md shadow-lg text-sm animate-fadeIn"
                     style={{ top: tooltip.top, whiteSpace: 'nowrap' }}>
                     {text}
                 </div>
@@ -173,18 +130,36 @@ const SidebarItem = ({ to, icon, text, isSidebarOpen }) => {
     )
 }
 
-const SidebarDropdownTrigger = ({ icon, text, isOpen, isSidebarOpen, onClick }) => (
-    <button
-        className={`flex items-center w-full px-3 py-2.5 rounded-md transition-colors ${isSidebarOpen ? 'justify-start' : 'justify-center'} ${
-            isOpen ? 'bg-background-accent/20 text-navy-blue' : 'text-navy-blue hover:bg-light-gray'
-        }`}
-        onClick={onClick}>
-        <span className="text-xl">{icon}</span>
-        {isSidebarOpen && (
-            <>
-                <span className="ml-3 truncate">{text}</span>
-                <IoIosArrowDown className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-            </>
-        )}
-    </button>
-)
+const SidebarDropdownTrigger = ({ icon, text, isOpen, isSidebarOpen, onClick }) => {
+    const [tooltip, setTooltip] = useState({ visible: false, top: 0 })
+
+    return (
+        <button
+            className={`flex items-center w-full px-3 py-2.5 rounded-md transition-colors ${isSidebarOpen ? 'justify-start' : 'justify-center'} ${
+                isOpen ? 'bg-background-accent/20 text-navy-blue' : 'text-navy-blue hover:bg-light-gray'
+            }`}
+            onClick={onClick}
+            onMouseEnter={(e) => {
+                if (!isSidebarOpen) {
+                    const rect = e.currentTarget.getBoundingClientRect()
+                    setTooltip({ visible: true, top: rect.top + window.scrollY })
+                }
+            }}
+            onMouseLeave={() => setTooltip({ visible: false, top: 0 })}>
+            <span className="text-xl">{icon}</span>
+            {isSidebarOpen && (
+                <>
+                    <span className="ml-3 truncate">{text}</span>
+                    <IoIosArrowDown className={`ml-auto transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+                </>
+            )}
+            {tooltip.visible && !isSidebarOpen && (
+                <div
+                    className="fixed z-50 left-20 bg-white text-dark-gray px-4 py-2 rounded-md shadow-lg text-sm animate-fadeIn"
+                    style={{ top: tooltip.top, whiteSpace: 'nowrap' }}>
+                    {text}
+                </div>
+            )}
+        </button>
+    )
+}
