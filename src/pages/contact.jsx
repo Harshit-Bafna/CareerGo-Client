@@ -61,8 +61,8 @@ const Contact = () => {
                             <span className="mb-4 block text-base font-semibold text-blue-900">Contact Us</span>
                             <h2 className="mb-6 font-bold uppercase text-3xl text-dark-gray">GET IN TOUCH WITH US</h2>
                             <p className="mb-9 text-base leading-relaxed text-body-color dark:text-dark-6">
-                                CareerGo helps you make informed choices for your education, from selecting the right college to stream and school.
-                                Contact us for personalized guidance.
+                                CareerGo helps you make informed choices for your education, from selecting the right college to book counselling
+                                sessions. Contact us for personalized guidance.
                             </p>
 
                             <div className="mb-6 flex w-full max-w-[370px]">
