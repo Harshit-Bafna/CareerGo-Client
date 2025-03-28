@@ -1,14 +1,14 @@
-1. route hiding
-2. change content od unauth files (eg- stream and scholls selection etc mentioned at many places)
+1. message page
+2. change content of home page feature section (eg- stream and scholls selection etc mentioned )
 3. view details page of institution recommendation
 4. userProfileProgress calculations (dynamic)
 5. fix error messages in backend
 6. backend email template 
 7. You will receive a confirmation email once your request is approved (backend work)
-8. sidebar dropdown navigation not working 
+8. fees range filter and course catgory 
 9. edit couse btn does not fetch full details in institution profile page 
 10. unable to add Achievements in profile
-11. Certification save bottom wrong response message
+11. Certification save buttom wrong response message
 12. Certification delete should ask for confirm delete
 13. education deletion alert not looking good
-14. make 1 page where users can view all institutions registered 
+14. 
