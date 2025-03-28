@@ -65,22 +65,22 @@ const testimonials = [
         id: 1,
         name: 'Aditya Nair',
         institution: 'VIT Vellore',
-        review: 'CareerGo’s expert resources and AI-driven tests helped me align my choices with my interests. It’s a game-changer for students!',
+        review: "CareerGo's expert resources and AI-driven recommendations helped me align my choices with my interests. It's a game-changer for students!",
         rating: 5,
         image: person1,
     },
     {
         id: 2,
         name: 'Megha Rathi',
-        institution: 'Symbiosis Pune',
-        review: 'I love how CareerGo simplifies the entire career planning journey. From stream selection to college recommendations, it covers everything!',
+        institution: 'IIT Bombay',
+        review: 'I love how CareerGo simplifies the entire career planning journey. From booking counselling sessions to college recommendations, it covers everything!',
         rating: 4,
         image: person2,
     },
     {
         id: 3,
         name: 'Aarav Mehta',
-        institution: 'Delhi Public School, Bangalore',
+        institution: 'NIT Trichy',
         review: 'CareerGo made my college selection process so much smoother! The AI-driven recommendations truly helped me find the best fit for my future.',
         rating: 5,
         image: person3,
@@ -88,23 +88,23 @@ const testimonials = [
     {
         id: 4,
         name: 'Riya Sharma',
-        institution: 'St. Xavier’s School, Jaipur',
-        review: 'I was confused about which stream to choose after 10th, but CareerGo’s assessments gave me clarity. Highly recommend it to students!',
+        institution: 'BITS Pilani',
+        review: "I was confused about which college to choose after 12th, but CareerGo's recommendations gave me clarity. Highly recommend it to students!",
         rating: 4,
         image: person4,
     },
     {
         id: 5,
         name: 'Kunal Verma',
-        institution: 'Amity International School, Noida',
-        review: 'Finding the right school for my child felt overwhelming, but CareerGo provided insightful recommendations that made the decision easier.',
+        institution: 'IIIT Hyderabad',
+        review: 'Finding the right college for my child felt overwhelming, but CareerGo provided insightful recommendations that made the decision easier.',
         rating: 4,
         image: person5,
     },
     {
         id: 6,
         name: 'Sneha Kapoor',
-        institution: 'Christ University, Bangalore',
+        institution: 'IIT Delhi',
         review: 'The platform is user-friendly and offers personalized career guidance. It helped me explore options I had not even considered before!',
         rating: 4,
         image: person6,
@@ -196,18 +196,19 @@ export default function Home() {
                 </div>
 
                 <div className="w-full md:w-1/2 text-center md:text-left">
-                    <h2 className="text-3xl md:text-4xl font-bold text-dark-gray">Discover Your Path with AI-Driven Career Assessment Tests</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-dark-gray">Discover Your Path with AI-Driven College Recommendations</h2>
                     <p className="mt-4 text-gray-600">
-                        Our AI-powered assessments help students identify their strengths and interests, guiding them toward the right academic
-                        stream. Make informed decisions that align with your career aspirations.
+                        Our AI-powered recommendations help students identify their strengths and interests, guiding them toward the right academic
+                        path. Make informed decisions that align with your career aspirations.
                     </p>
 
                     <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div className="flex flex-col items-center md:items-start text-center md:text-left">
                             <FaUserGraduate className="text-blue-600 text-xl" />
-                            <h3 className="mt-3 text-xl font-semibold text-dark-gray">Personalized Insights</h3>
+                            <h3 className="mt-3 text-xl font-semibold text-dark-gray">Counselling Sessions</h3>
                             <p className="mt-2 text-gray-500">
-                                Tailored recommendations based on individual skills and interests for optimal stream selection.
+                                Get expert guidance with personalized counseling sessions for the best college selection based on your skills and
+                                interests.
                             </p>
                         </div>
 
@@ -279,7 +280,7 @@ export default function Home() {
                 <div className="text-center rounded-lg w-full md:w-auto">
                     <h2 className="text-2xl sm:text-3xl font-bold mb-4">Start Your Career Journey Today</h2>
                     <p className="text-gray-600 mb-6 text-sm md:text-base">
-                        Unlock your potential with a free consultation or career assessment tailored just for you.
+                        Unlock your potential with a free recommendations or counselling sessions tailored just for you.
                     </p>
                     <div className="flex justify-center gap-4 flex-col md:flex-row">
                         <button
@@ -300,7 +301,7 @@ export default function Home() {
                         <div className="bg-white p-6 rounded-lg shadow-lg max-w-md text-center">
                             <h3 className="text-xl font-semibold mb-4">Why Choose Us?</h3>
                             <p className="text-gray-700 mb-4">
-                                Get personalized career guidance, AI-powered assessments, and expert insights to help you make informed decisions.
+                                Get personalized career guidance, AI-powered recommendations, and expert insights to help you make informed decisions.
                             </p>
                             <button
                                 className="bg-red-600 text-white px-4 py-2 rounded-lg"
