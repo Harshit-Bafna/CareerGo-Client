@@ -1,5 +1,5 @@
 1. route hiding
-2. page not found for authnticated pages
+2. change content od unauth files (eg- stream and scholls selection etc mentioned at many places)
 3. view details page of institution recommendation
 4. userProfileProgress calculations (dynamic)
 5. fix error messages in backend
@@ -11,4 +11,4 @@
 11. Certification save bottom wrong response message
 12. Certification delete should ask for confirm delete
 13. education deletion alert not looking good
-14. 
+14. make 1 page where users can view all institutions registered 

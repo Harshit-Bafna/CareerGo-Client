@@ -1,124 +1,122 @@
-import { FaFacebookF, FaTwitter, FaYoutube, FaLinkedinIn, FaPhoneAlt } from 'react-icons/fa'
+import { FaPhoneAlt, FaEnvelope } from 'react-icons/fa'
 import logo from '../../assets/logo.png'
 import { NavLink } from 'react-router-dom'
 
 const Footer = () => {
     return (
-        <footer className="relative p-10 shadow-input-shadow">
+        <footer className="relative p-10 bg-gray-100 shadow-md">
             <div className="container mx-auto px-4">
-                <div className="flex flex-wrap justify-between gap-y-10 sm:grid sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="w-full sm:w-auto">
-                        <div className="mb-4 w-full">
-                            <NavLink to="/">
-                                <img
-                                    src={logo}
-                                    alt="logo"
-                                    className="mb-3 h-9 w-auto"
-                                />
-                            </NavLink>
-                            <p className="mb-4 text-sm text-body-color">
-                                CareerGo helps you make informed choices for your education, from selecting the right college to stream and school.
-                                Contact us for personalized guidance.
-                            </p>
-                            <p className="flex items-center text-sm font-medium">
-                                <span className="mr-3">
-                                    <FaPhoneAlt size={18} />
-                                </span>
-                                <a href="tel:+918141425799" target='_blank'>(+91) 8141425799</a>
-                            </p>
-                        </div>
+                <div className="grid gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+                    <div className="w-full">
+                        <NavLink to="/">
+                            <img
+                                src={logo}
+                                alt="logo"
+                                className="mb-3 h-9 w-auto"
+                            />
+                        </NavLink>
+                        <p className="mb-4 text-sm text-gray-600">
+                            CareerGo helps you make informed choices for your education, from selecting the right college to booking counseling
+                            sessions with esteemed universities. Contact us for personalized guidance.
+                        </p>
+                        <p className="flex items-center text-sm font-medium text-gray-700">
+                            <FaPhoneAlt
+                                className="mr-2"
+                                size={16}
+                            />
+                            <a
+                                href="tel:+918141425799"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                (+91) 8141425799
+                            </a>
+                        </p>
+                        <p className="flex items-center text-sm font-medium text-gray-700 mt-2">
+                            <FaEnvelope
+                                className="mr-2"
+                                size={16}
+                            />
+                            <a
+                                href="mailto:contact@careergo.com"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                careergo@gmail.com
+                            </a>
+                        </p>
                     </div>
 
-                    <div className="mx-4">
-                        <h2 className="mb-4 text-lg font-semibold">Quick Links</h2>
-                        <ul className="space-y-2 text-sm">
+                    <div>
+                        <h2 className="mb-4 text-lg font-semibold text-gray-800">Quick Links</h2>
+                        <ul className="space-y-2 text-sm text-gray-700">
                             <li>
                                 <NavLink
                                     to="/"
-                                    className="hover:underline">
+                                    className="hover:text-blue-500">
                                     Home
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink
                                     to="/about"
-                                    className="hover:underline">
+                                    className="hover:text-blue-500">
                                     About Us
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink
                                     to="/contact"
-                                    className="hover:underline">
+                                    className="hover:text-blue-500">
                                     Contact Us
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink
                                     to="/signin"
-                                    className="hover:underline">
+                                    className="hover:text-blue-500">
                                     Sign in
                                 </NavLink>
                             </li>
                             <li>
                                 <NavLink
                                     to="/signup"
-                                    className="hover:underline">
+                                    className="hover:text-blue-500">
                                     Sign up
                                 </NavLink>
                             </li>
                         </ul>
                     </div>
 
-                    <div className="mx-4">
-                        <h2 className="mb-4 text-lg font-semibold">Our Partners</h2>
-                        <ul className="space-y-2 text-sm">
-                            <li>
-                                <p>Delhi Public School (DPS)</p>
-                            </li>
-                            <li>
-                                <p>All India Institute of Medical Sciences (AIIMS)</p>
-                            </li>
-                            <li>
-                                <p>Ryan International School</p>
-                            </li>
-                            <li>
-                                <p>Vellore Institute of Technology (VIT)</p>
-                            </li>
+                    <div>
+                        <h2 className="mb-4 text-lg font-semibold text-gray-800">Our Partners</h2>
+                        <ul className="space-y-2 text-sm text-gray-700">
+                            <li>Vellore Institute of Technology (VIT)</li>
+                            <li>IIT Bombay</li>
+                            <li>BITS Pilani</li>
+                            <li>IIIT Hyderabad</li>
+                            <li>NIT Trichy</li>
+                            <li>IIT Delhi</li>
                         </ul>
                     </div>
 
-                    <div className="w-full sm:w-auto">
-                        <h4 className="mb-4 text-lg font-semibold text-dark dark:text-white">Follow Us On</h4>
-                        <div className="mb-4 flex space-x-3">
+                    <div>
+                        <h2 className="mb-4 text-lg font-semibold text-gray-800">Our Location</h2>
+                        <div className="rounded-lg overflow-hidden border border-gray-300 shadow-sm">
                             <a
-                                href="https://www.facebook.com"
+                                href="https://www.google.com/maps/place/VIT+Bhopal+University/@23.1843811,76.7642691,15z"
                                 target="_blank"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke text-dark dark:border-dark-3 dark:text-white">
-                                <FaFacebookF size={16} />
-                            </a>
-                            <a
-                                href="https://www.twitter.com"
-                                target="_blank"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke text-dark dark:border-dark-3 dark:text-white">
-                                <FaTwitter size={16} />
-                            </a>
-                            <a
-                                href="https://www.youtube.com"
-                                target="_blank"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke text-dark dark:border-dark-3 dark:text-white">
-                                <FaYoutube size={16} />
-                            </a>
-                            <a
-                                href="https://www.linkedin.com"
-                                target="_blank"
-                                className="flex h-8 w-8 items-center justify-center rounded-full border border-stroke text-dark dark:border-dark-3 dark:text-white">
-                                <FaLinkedinIn size={16} />
+                                rel="noopener noreferrer">
+                                <iframe
+                                    title="VIT Bhopal Location"
+                                    className="w-full h-48"
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3670.5357352578176!2d76.84871217451133!3d23.077476414278653!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397ce9ceaaaaaaab%3A0xa224b6b82b421f83!2sVIT%20Bhopal%20University!5e0!3m2!1sen!2sin!4v1743148495329!5m2!1sen!2sin"
+                                    allowFullScreen=""
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"></iframe>
                             </a>
                         </div>
-                        <p className="text-sm text-body-color dark:text-dark-6">&copy; 2025 Vitians</p>
                     </div>
                 </div>
+                <p className="mt-10 text-center text-sm text-gray-600">&copy; 2025 CareerGo | All Rights Reserved</p>
             </div>
         </footer>
     )
