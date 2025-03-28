@@ -12,6 +12,7 @@ import BookCounselling from '../pagesAuthenticated/Counselling/BookCounselling'
 import ViewCounselling from '../pagesAuthenticated/Counselling/ViewCounselling'
 import Logout from '../pagesAuthenticated/Logout'
 import Support from '../pagesAuthenticated/Support'
+import AuthenticatedPageNotFound from '../pagesAuthenticated/AuthenticatedPageNotFound'
 
 export const UserRouter = createBrowserRouter(
     createRoutesFromElements(
@@ -63,6 +64,10 @@ export const UserRouter = createBrowserRouter(
             <Route
                 path="/logout"
                 element={<Logout />}
+            />
+            <Route
+                path="*"
+                element={<AuthenticatedPageNotFound /> }
             />
         </>
     )
