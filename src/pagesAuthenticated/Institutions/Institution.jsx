@@ -91,6 +91,7 @@ const Institution = () => {
                 setMinFeesRange(value)
                 break
             case 'maxFeesRange':
+                if (!minFeesRange) setMinFeesRange(0)
                 setMaxFeesRange(value)
                 break
             case 'hostel':

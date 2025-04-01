@@ -1,14 +1,12 @@
-1. message page
-2. change content of home page feature section (eg- stream and scholls selection etc mentioned )
-3. view details page of institution recommendation
-4. userProfileProgress calculations (dynamic)
-5. fix error messages in backend
-6. backend email template 
-7. You will receive a confirmation email once your request is approved (backend work)
-8. fees range filter and course catgory 
-9. edit couse btn does not fetch full details in institution profile page 
-10. unable to add Achievements in profile
-11. Certification save buttom wrong response message
-12. Certification delete should ask for confirm delete
-13. education deletion alert not looking good
-14. 
+Backend
+- *show courseCategories data in filters page from backend (right now it is just an array in frontend)
+- *category filter not working in institutions page 
+- *fix error messages in backend
+- *backend email template 
+- *You will receive a confirmation email once your request is approved (backend work)
+
+Frontend
+- change content of home page feature section (eg- stream and scholls selection etc mentioned )
+- message page
+- view details page of institution recommendation
+- when i open institutionProfile page it is working well, but at the moment i refreshes the page , it shows 404 page

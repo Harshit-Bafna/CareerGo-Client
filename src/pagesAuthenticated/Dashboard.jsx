@@ -27,7 +27,7 @@ const Dashboard = () => {
     const [upcomingSessions, setUpcomingSessions] = useState([])
     const [completedSessions, setCompletedSessions] = useState([])
 
-    const { name, emailAddress, profileImage, userProfileProgress } = useSelector((state) => state.user)
+    const { name, emailAddress, profileImage, userProfileProgress, role } = useSelector((state) => state.user)
     const [userData, setUserData] = useState({
         name: '',
         email: '',
@@ -386,39 +386,43 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    <div className="lg:hidden bg-background-white rounded-lg shadow-input-shadow p-6 mb-6">
-                        <h3 className="text-lg font-medium text-text-primary mb-4">Profile Completion</h3>
-                        <div className="w-full bg-light-gray rounded-full h-4">
-                            <div
-                                className="bg-deep-blue h-4 rounded-full"
-                                style={{ width: `${userProfileProgress}%` }}></div>
+                    {role !== 'Organisation Admin' && (
+                        <div className="lg:hidden bg-background-white rounded-lg shadow-input-shadow p-6 mb-6">
+                            <h3 className="text-lg font-medium text-text-primary mb-4">Profile Completion</h3>
+                            <div className="w-full bg-light-gray rounded-full h-4">
+                                <div
+                                    className="bg-deep-blue h-4 rounded-full"
+                                    style={{ width: `${userProfileProgress}%` }}></div>
+                            </div>
+                            <div className="flex justify-between mt-2">
+                                <span className="text-sm text-text-secondary">{userProfileProgress}% Completed</span>
+                                <NavLink
+                                    to="/dashboard/userProfile"
+                                    className="text-sm text-deep-blue hover:underline">
+                                    Complete Now
+                                </NavLink>
+                            </div>
                         </div>
-                        <div className="flex justify-between mt-2">
-                            <span className="text-sm text-text-secondary">{userProfileProgress}% Completed</span>
-                            <NavLink
-                                to="/dashboard/userProfile"
-                                className="text-sm text-deep-blue hover:underline">
-                                Complete Now
-                            </NavLink>
-                        </div>
-                    </div>
+                    )}
 
-                    <div className="hidden lg:block bg-background-white rounded-lg shadow-input-shadow p-6">
-                        <h3 className="text-lg font-medium text-text-primary mb-4">Profile Completion</h3>
-                        <div className="w-full bg-light-gray rounded-full h-4">
-                            <div
-                                className="bg-deep-blue h-4 rounded-full"
-                                style={{ width: `${userProfileProgress}%` }}></div>
+                    {role !== 'Organisation Admin' && (
+                        <div className="hidden lg:block bg-background-white rounded-lg shadow-input-shadow p-6">
+                            <h3 className="text-lg font-medium text-text-primary mb-4">Profile Completion</h3>
+                            <div className="w-full bg-light-gray rounded-full h-4">
+                                <div
+                                    className="bg-deep-blue h-4 rounded-full"
+                                    style={{ width: `${userProfileProgress}%` }}></div>
+                            </div>
+                            <div className="flex justify-between mt-2">
+                                <span className="text-sm text-text-secondary">{userProfileProgress}% Completed</span>
+                                <NavLink
+                                    to="/dashboard/userProfile"
+                                    className="text-sm text-deep-blue hover:underline">
+                                    Complete Now
+                                </NavLink>
+                            </div>
                         </div>
-                        <div className="flex justify-between mt-2">
-                            <span className="text-sm text-text-secondary">{userProfileProgress}% Completed</span>
-                            <NavLink
-                                to="/dashboard/userProfile"
-                                className="text-sm text-deep-blue hover:underline">
-                                Complete Now
-                            </NavLink>
-                        </div>
-                    </div>
+                    )}
 
                     <div className="lg:hidden bg-background-white rounded-lg shadow-input-shadow p-6">
                         <div className="flex items-center mb-4">

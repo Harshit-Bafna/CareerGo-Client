@@ -11,7 +11,7 @@ const UserProfile = () => {
     const location = useLocation()
     const dispatch = useDispatch()
 
-    const { name, emailAddress, profileImage } = useSelector((state) => state.user)
+    const { name, emailAddress, profileImage, role } = useSelector((state) => state.user)
 
     const [userData, setUserData] = useState({
         name: '',
@@ -28,17 +28,20 @@ const UserProfile = () => {
 
     const [hover, setHover] = useState(false)
 
-    const tabs = [
-        { id: '', label: 'Basic Info', icon: FaUser, path: '' },
-        {
-            id: 'certificationAndCourses',
-            label: 'Certification And Courses',
-            icon: FaCertificate,
-            path: '/dashboard/userProfile/certificationAndCourses',
-        },
-        { id: 'education', label: 'Education', icon: FaGraduationCap, path: '/dashboard/userProfile/education' },
-        { id: 'achievements', label: 'Achievements', icon: FaTrophy, path: '/dashboard/userProfile/achievements' },
-    ]
+    const tabs = []
+    if (role !== 'Organisation Admin') {
+        tabs.push(
+            { id: '', label: 'Basic Info', icon: FaUser, path: '' },
+            {
+                id: 'certificationAndCourses',
+                label: 'Certification And Courses',
+                icon: FaCertificate,
+                path: '/dashboard/userProfile/certificationAndCourses',
+            },
+            { id: 'education', label: 'Education', icon: FaGraduationCap, path: '/dashboard/userProfile/education' },
+            { id: 'achievements', label: 'Achievements', icon: FaTrophy, path: '/dashboard/userProfile/achievements' }
+        )
+    }
 
     const handleImageChange = async (e) => {
         const file = e.target.files?.[0]
@@ -56,7 +59,6 @@ const UserProfile = () => {
             const response = await dispatch(uploadToAWS(payload)).unwrap()
 
             dispatch(updateProfileImage({ profileImage: response.data.fileUrl }))
-
         }
     }
 
