@@ -11,6 +11,7 @@ import InstitutionProfile from '../pagesAuthenticated/Institution Profile/Instit
 import ViewCounselling from '../pagesAuthenticated/Counselling/ViewCounselling'
 import Logout from '../pagesAuthenticated/Logout'
 import Support from '../pagesAuthenticated/Support'
+import AuthenticatedPageNotFound from '../pagesAuthenticated/AuthenticatedPageNotFound'
 
 export const InstitutionRouter = createBrowserRouter(
     createRoutesFromElements(
@@ -58,6 +59,10 @@ export const InstitutionRouter = createBrowserRouter(
             <Route
                 path="/logout"
                 element={<Logout />}
+            />
+            <Route
+                path="*"
+                element={<AuthenticatedPageNotFound />}
             />
         </>
     )

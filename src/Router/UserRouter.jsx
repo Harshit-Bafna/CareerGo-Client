@@ -13,6 +13,8 @@ import ViewCounselling from '../pagesAuthenticated/Counselling/ViewCounselling'
 import Logout from '../pagesAuthenticated/Logout'
 import Support from '../pagesAuthenticated/Support'
 import AuthenticatedPageNotFound from '../pagesAuthenticated/AuthenticatedPageNotFound'
+import InstitutionDetails from '../pagesAuthenticated/Institutions/InstitutionDetails'
+import Institution from '../pagesAuthenticated/Institutions/Institution'
 
 export const UserRouter = createBrowserRouter(
     createRoutesFromElements(
@@ -60,6 +62,14 @@ export const UserRouter = createBrowserRouter(
                     path="support"
                     element={<Support />}
                 />
+                <Route
+                    path="institutions"
+                    element={<Institution />}
+                />
+                <Route
+                    path="institution/:institutionId"
+                    element={<InstitutionDetails />}
+                />
             </Route>
             <Route
                 path="/logout"
@@ -67,7 +77,7 @@ export const UserRouter = createBrowserRouter(
             />
             <Route
                 path="*"
-                element={<AuthenticatedPageNotFound /> }
+                element={<AuthenticatedPageNotFound />}
             />
         </>
     )

@@ -11,11 +11,11 @@ const About = () => {
                     <p className="font-normal text-sm text-gray-600 hover:text-gray-800 cursor-pointer pb-1">About Us</p>
                     <h2 className="w-full font-bold lg:text-4xl text-3xl">Your Future, Our Mission!</h2>
                     <p className="text-justify font-normal text-base text-gray-600 mt-6">
-                        We are here to make the process of career selection seamless and empowering for every student. It’s no secret that navigating
-                        educational choices can be overwhelming, but with CareerGo, you can focus on what truly matters—unlocking your potential. Our
-                        mission is rooted in providing clarity, guidance, and personalized solutions at every step of your academic journey. Let us
-                        help you explore opportunities, make informed decisions, and design a path that’s uniquely yours. Together, we can turn
-                        aspirations into achievements.
+                        We are here to make the process of career selection seamless and empowering for every student. It&apos;s no secret that
+                        navigating educational choices can be overwhelming, but with CareerGo, you can focus on what truly matters—unlocking your
+                        potential. Our mission is rooted in providing clarity, guidance, and personalized solutions at every step of your academic
+                        journey. Let us help you explore opportunities, make informed decisions, and design a path that&apos;s uniquely yours.
+                        Together, we can turn aspirations into achievements.
                     </p>
                 </div>
                 <div className="w-full md:w-5/12">
@@ -24,14 +24,14 @@ const About = () => {
                         src={AboutImg}
                         alt="about us"
                     />
+
                     <div className="flex space-x-2 mt-5">
                         <div className="w-1/2 border border-gray-300 rounded-lg pl-4 pr-16 py-2">
-                            <h3 className="text-lg font-semibold">185+</h3>
-                            <p className="text-gray-600">Schools Registered</p>
+                            <h3 className="text-lg font-semibold">50+</h3>
+                            <p className="text-gray-600 font-normal">College Registered</p>
                         </div>
                         <div className="w-1/2 border border-gray-300 rounded-lg pl-4 pr-16 py-2">
-                            <h3 className="text-lg font-semibold">225+</h3>
-                            <p className="text-gray-600 font-normal">College Registered</p>
+                            <p className="text-gray-600">Counselling Sessions</p>
                         </div>
                     </div>
                 </div>
@@ -47,8 +47,8 @@ const About = () => {
                     </p>
                     <p className="font-normal text-base leading-6 text-gray-600 w-full lg:w-10/12 xl:w-9/12 mt-10">
                         By providing personalized solutions, actionable insights, and unwavering support, we strive to ensure that every student can
-                        unlock their potential, follow their passion, and achieve their dreams. Together, let’s create a future where every choice
-                        leads to success.
+                        unlock their potential, follow their passion, and achieve their dreams. Together, let&apos;s create a future where every
+                        choice leads to success.
                     </p>
                 </div>
                 <div className="w-full lg:w-6/12">
@@ -96,8 +96,8 @@ const About = () => {
                             <div className="">
                                 <p className="font-semibold lg:text-xl text-lg  text-gray-800">Impact</p>
                                 <p className="mt-1 font-normal text-base text-gray-600">
-                                    Revolutionizing career choices by connecting students with the right colleges, streams, and schools for their
-                                    aspirations.
+                                    Revolutionizing career choices by connecting students with the right colleges, and booking counselling sessions
+                                    for their aspirations.
                                 </p>
                             </div>
                         </div>

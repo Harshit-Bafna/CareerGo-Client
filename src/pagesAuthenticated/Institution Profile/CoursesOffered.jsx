@@ -223,29 +223,40 @@ const CoursesOffered = () => {
         setShowForm(true)
     }
 
-    const handleEditCourse = (course) => {
-        setFormData({
-            _id: course._id,
-            name: course.courseName,
-            category: course.category,
-            type: 'college',
-            duration: course.duration.toString(),
-            eligibility: course.eligibility,
-            mode: course.mode,
-            fees: course.fees ? `₹${course.fees}` : '',
-            syllabus: course.syllabus || [''],
-            admissionProcess: course.admissionProcess || '',
-            contactInfo: {
-                email: course.email || '',
-                phone: course.phone || '',
-                website: course.website || '',
-            },
-            brochureUrl: course.brochure || '',
-            brochureFile: null,
-        })
-        setFormMode('edit')
-        setShowForm(true)
-        setShowModal(false)
+    const handleEditCourse = async (course) => {
+        const response = await dispatch(
+            getCourseDetails({
+                institutionId,
+                courseId: course._id,
+            })
+        ).unwrap()
+
+        if (response.success && response.data.course) {
+            const fullCourseDetails = response.data.course
+
+            setFormData({
+                _id: fullCourseDetails._id,
+                name: fullCourseDetails.courseName,
+                category: fullCourseDetails.category,
+                type: 'college',
+                duration: fullCourseDetails.duration.toString(),
+                eligibility: fullCourseDetails.eligibility,
+                mode: fullCourseDetails.mode,
+                fees: fullCourseDetails.fees ? `₹${fullCourseDetails.fees}` : '',
+                syllabus: fullCourseDetails.syllabus || [''],
+                admissionProcess: fullCourseDetails.admissionProcess || '',
+                contactInfo: {
+                    email: fullCourseDetails.email || '',
+                    phone: fullCourseDetails.phone || '',
+                    website: fullCourseDetails.website || '',
+                },
+                brochureUrl: fullCourseDetails.brochure || '',
+                brochureFile: null,
+            })
+            setFormMode('edit')
+            setShowForm(true)
+            setShowModal(false)
+        }
     }
 
     const handleFormSubmit = async (e) => {

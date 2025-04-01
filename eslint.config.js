@@ -50,7 +50,7 @@ export default [
 
       // General JavaScript rules
       'no-console': 'error', // Allow useful console methods
-      'no-unused-vars': 'error', // Ignore unused variables starting with "_"
+      'no-unused-vars': ['error', { "argsIgnorePattern": "^_" }] , // Ignore unused variables starting with "_"
       'quotes': ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }], // Consistent quote usage
       'prefer-const': 'error', // Prefer const where possible
       'no-var': 'error', // Disallow var, prefer let/const

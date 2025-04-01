@@ -33,6 +33,60 @@ const Input = ({ label, name, value, onChange, placeholder, type = 'text', requi
     </div>
 )
 
+const ConfirmDialog = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title = 'Confirm Deletion',
+    message = 'Are you sure you want to delete? This action cannot be undone.',
+}) => {
+    if (!isOpen) return null
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                <div className="flex items-center gap-3 text-red-500 mb-4">
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line
+                            x1="12"
+                            y1="9"
+                            x2="12"
+                            y2="13"></line>
+                        <line
+                            x1="12"
+                            y1="17"
+                            x2="12.01"
+                            y2="17"></line>
+                    </svg>
+                    <h2 className="text-xl font-bold text-red-500">{title}</h2>
+                </div>
+                <p className="mb-6">{message}</p>
+                <div className="flex justify-end gap-2">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 const Education = () => {
     const dispatch = useDispatch()
     const [isEditing, setIsEditing] = useState(false)
@@ -52,6 +106,8 @@ const Education = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [isGradeDropdownOpen, setIsGradeDropdownOpen] = useState(false)
     const [editingEducation, setEditingEducation] = useState(null)
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+    const [educationToDelete, setEducationToDelete] = useState(null)
 
     const loading = useSelector((state) => state.user?.loading) || isLoading
     const apiError = useSelector((state) => state.user?.error)
@@ -295,15 +351,22 @@ const Education = () => {
         }
     }
 
-    const handleRemoveEducation = async (id) => {
-        if (window.confirm('Are you sure you want to delete this education?')) {
+    const handleRemoveEducation = async () => {
+        if (educationToDelete) {
             try {
-                await dispatch(deleteEducation({ educationId: id })).unwrap()
+                await dispatch(deleteEducation({ educationId: educationToDelete })).unwrap()
                 await fetchEducation()
+                setConfirmDialogOpen(false)
+                setEducationToDelete(null)
             } catch (err) {
                 setError(err.message || 'Failed to delete education')
             }
         }
+    }
+
+    const openDeleteConfirmation = (id) => {
+        setEducationToDelete(id)
+        setConfirmDialogOpen(true)
     }
 
     const renderEducationForm = (education, isNew = true) => {
@@ -580,7 +643,7 @@ const Education = () => {
                                             <FaEdit className="w-4 h-4" />
                                         </button>
                                         <button
-                                            onClick={() => handleRemoveEducation(edu.id)}
+                                            onClick={() => openDeleteConfirmation(edu.id)}
                                             className="text-red-500 hover:text-red-600">
                                             <FaTrash className="w-4 h-4" />
                                         </button>
@@ -595,6 +658,11 @@ const Education = () => {
                     <div className="text-center py-6 text-gray-500">No education records found. Click Edit to add your education details.</div>
                 )}
             </div>
+            <ConfirmDialog
+                isOpen={confirmDialogOpen}
+                onClose={() => setConfirmDialogOpen(false)}
+                onConfirm={handleRemoveEducation}
+            />
         </div>
     )
 }
