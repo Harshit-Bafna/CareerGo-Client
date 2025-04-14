@@ -1,4 +1,4 @@
-import { FaBookOpen, FaUser, FaLightbulb, FaLock, FaHeadset } from 'react-icons/fa'
+import { FaBookOpen, FaUser, FaUniversity, FaLightbulb, FaLock, FaHeadset } from 'react-icons/fa'
 import { MdSpaceDashboard } from 'react-icons/md'
 
 export const UserMenu = [
@@ -17,6 +17,12 @@ export const UserMenu = [
             { to: '/dashboard/userProfile', icon: <FaUser />, text: 'Profile' },
             { to: '/dashboard/changePassword', icon: <FaLock />, text: 'Change Password' },
         ],
+    },
+    {
+        type: 'item',
+        to: '/dashboard/institutions',
+        icon: <FaUniversity className="text-lg" />,
+        text: 'Institutions',
     },
     {
         type: 'item',

@@ -169,7 +169,7 @@ const UserProfile = () => {
             dispatch(updateBasicInfo(payload))
         } else if (editSection === 'social') {
             const socialLinksArray = Object.entries(socialLinks)
-                .filter(([url]) => url.trim() !== '')
+                .filter(([_, url]) => url.trim() !== '')
                 .map(([platform, url]) => ({
                     platform,
                     url,

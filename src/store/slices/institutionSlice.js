@@ -63,7 +63,29 @@ export const updateInstitutionDetails = createAsyncThunk('institution/updateDeta
     }
 })
 
-export const getAllInstitutions = createAsyncThunk('institution/get', async ({ search, page, limit }, thunkAPI) => {
+export const getAllInstitutions = createAsyncThunk('institution/get', async ({ search, page, limit, minFeesRange, maxFeesRange, hostel, admission, courseCategory }, thunkAPI) => {
+    try {
+        const { data } = await api.get(`/${institutionURL}/getAll?page=${page}&limit=${limit}&search=${search}&minFeesRange=${minFeesRange}&maxFeesRange=${maxFeesRange}&hostel=${hostel}&admission=${admission}&courseCategory=${courseCategory}`)
+
+        if (!data.success) {
+            thunkAPI.dispatch(setError(data.message))
+            return thunkAPI.rejectWithValue(data.message)
+        }
+
+        return data
+
+    } catch (error) {
+        const errorMessage =
+            api.isAxiosError(error) && error.response?.data?.message
+                ? error.response.data.message
+                : 'Something went wrong'
+
+        thunkAPI.dispatch(setError(errorMessage))
+        return thunkAPI.rejectWithValue(errorMessage)
+    }
+})
+
+export const getAllInstitutionsList = createAsyncThunk('institution/get', async ({ search, page, limit }, thunkAPI) => {
     try {
         const { data } = await api.get(`/${institutionURL}/getAllInstitutionList?search=${search}&page=${page}&limit=${limit}`)
 

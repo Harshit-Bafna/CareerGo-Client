@@ -1,124 +1,361 @@
 import { useState, useEffect } from 'react'
-import { FaEdit, FaSave, FaPlus, FaTrash } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
+import { FaEdit, FaSave, FaPlus, FaTrash } from 'react-icons/fa'
 import { getCertification, createCertification, updateCertification, deleteCertification } from '../../store/slices/userSlice'
 
-const Input = ({ name, value, onChange, placeholder, type = 'text', required = false, label }) => (
-    <div className="flex flex-col space-y-1">
+const Input = ({ label, name, value, onChange, placeholder, type = 'text', required = true }) => (
+    <div className="mb-2">
         <label
-            htmlFor={name}
-            className="text-sm font-medium text-gray-700 flex items-center">
-            {label}
-            {required && <span className="text-red-500">*</span>}
+            htmlFor="gradeType"
+            className="block text-sm font-medium text-gray-700 mb-1">
+            {label} {required && <span className="text-red-500">*</span>}
         </label>
         <input
-            id={name}
             type={type}
             name={name}
-            value={value}
+            value={value || ''}
             onChange={onChange}
             placeholder={placeholder}
-            required={required}
             className="w-full p-2 border rounded-md"
+            required={required}
         />
     </div>
 )
 
+const ConfirmDialog = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title = 'Confirm Deletion',
+    message = 'Are you sure you want to delete? This action cannot be undone.',
+}) => {
+    if (!isOpen) return null
+
+    return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full">
+                <div className="flex items-center gap-3 text-red-500 mb-4">
+                    <svg
+                        viewBox="0 0 24 24"
+                        width="24"
+                        height="24"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="none"
+                        strokeLinecap="round"
+                        strokeLinejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line
+                            x1="12"
+                            y1="9"
+                            x2="12"
+                            y2="13"></line>
+                        <line
+                            x1="12"
+                            y1="17"
+                            x2="12.01"
+                            y2="17"></line>
+                    </svg>
+                    <h2 className="text-xl font-bold text-red-500">{title}</h2>
+                </div>
+                <p className="mb-6">{message}</p>
+                <div className="flex justify-end gap-2">
+                    <button
+                        onClick={onClose}
+                        className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        className="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors">
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 const CertificationAndCourses = () => {
     const dispatch = useDispatch()
-    const { loading, error } = useSelector((state) => state.user || {})
-
     const [isEditing, setIsEditing] = useState(false)
     const [certifications, setCertifications] = useState([])
-
     const [newCertification, setNewCertification] = useState({
         title: '',
-        issuedBy: '',
-        startDate: '',
-        endDate: '',
-        expiryDate: '',
+        fields: {
+            issuedBy: '',
+            startDate: '',
+            endDate: '',
+            expiryDate: '',
+        },
     })
+    const [error, setError] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const [editingCertification, setEditingCertification] = useState(null)
+    const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
+    const [certificationToDelete, setCertificationToDelete] = useState(null)
+
+    const loading = useSelector((state) => state.user?.loading) || isLoading
+    const apiError = useSelector((state) => state.user?.error)
 
     useEffect(() => {
         fetchCertifications()
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    }, [dispatch])
 
     const fetchCertifications = async () => {
-        const resultAction = await dispatch(getCertification())
-        if (getCertification.fulfilled.match(resultAction)) {
-            const mappedCertifications = resultAction.payload.data.certifications.map((cert) => ({
-                id: cert._id,
-                title: cert.title,
-                issuedBy: cert.issuedBy,
-                startDate: cert.startDate,
-                endDate: cert.endDate || '',
-                expiryDate: cert.expiryDate || '',
-            }))
-            setCertifications(mappedCertifications)
+        setIsLoading(true)
+        try {
+            const result = await dispatch(getCertification()).unwrap()
+            if (result.success) {
+                const formattedCertifications = result.data.certifications.map((cert) => ({
+                    id: cert._id,
+                    title: cert.title,
+                    fields: {
+                        issuedBy: cert.issuedBy || '',
+                        startDate: cert.startDate ? cert.startDate.substring(0, 10) : '',
+                        endDate: cert.endDate ? cert.endDate.substring(0, 10) : '',
+                        expiryDate: cert.expiryDate ? cert.expiryDate.substring(0, 10) : '',
+                    },
+                }))
+
+                setCertifications(formattedCertifications)
+            }
+        } catch (err) {
+            setError(err.message || 'Failed to fetch certification data')
+        } finally {
+            setIsLoading(false)
         }
     }
 
-    const toggleEdit = async () => {
-        if (isEditing) {
-            await fetchCertifications()
-        }
+    const toggleEdit = () => {
         setIsEditing(!isEditing)
+        setEditingCertification(null)
     }
 
-    const handleChange = (e, id) => {
+    const handleFieldChange = (e) => {
         const { name, value } = e.target
-        setCertifications((prev) => prev.map((cert) => (cert.id === id ? { ...cert, [name]: value } : cert)))
+        setNewCertification((prev) => ({
+            ...prev,
+            fields: { ...prev.fields, [name]: value },
+        }))
+        setError('')
     }
 
-    const handleAddCertification = async (e) => {
-        e.preventDefault()
-        if (newCertification.title && newCertification.issuedBy && newCertification.startDate) {
-            const payload = {
-                title: newCertification.title,
-                issuedBy: newCertification.issuedBy,
-                startDate: newCertification.startDate,
-                endDate: newCertification.endDate || undefined,
-                expiryDate: newCertification.expiryDate || undefined,
-            }
+    const validateFields = (certification) => {
+        const { title, fields } = certification
 
-            const resultAction = await dispatch(createCertification(payload))
-            if (createCertification.fulfilled.match(resultAction)) {
-                await fetchCertifications()
-                setNewCertification({ title: '', issuedBy: '', startDate: '', endDate: '', expiryDate: '' })
-            }
+        if (!title) {
+            setError('Title is required')
+            return false
         }
+
+        if (!fields.issuedBy) {
+            setError('Issuing organization is required')
+            return false
+        }
+
+        if (!fields.startDate) {
+            setError('Start date is required')
+            return false
+        }
+
+        if (!fields.endDate) {
+            setError('End date is required')
+            return false
+        }
+
+        return true
     }
 
-    const handleUpdateCertification = async (id) => {
-        const certification = certifications.find((cert) => cert.id === id)
-        if (!certification) return
+    const prepareCertificationPayload = (certification) => {
+        const { title, fields } = certification
 
         const payload = {
-            certificationId: id,
+            title: title,
+            issuedBy: fields.issuedBy,
+            startDate: fields.startDate,
+            endDate: fields.endDate || null,
+            expiryDate: fields.expiryDate || null,
+        }
+
+        return payload
+    }
+
+    const handleAddCertification = async () => {
+        if (validateFields(newCertification)) {
+            try {
+                const payload = prepareCertificationPayload(newCertification)
+                const result = await dispatch(createCertification(payload)).unwrap()
+
+                if (result.success) {
+                    await fetchCertifications()
+                    setNewCertification({
+                        title: '',
+                        fields: {
+                            issuedBy: '',
+                            startDate: '',
+                            endDate: '',
+                            expiryDate: '',
+                        },
+                    })
+                    setError('')
+                }
+            } catch (err) {
+                setError(err.message || 'Failed to add certification')
+            }
+        }
+    }
+
+    const startEditCertification = (certification) => {
+        setEditingCertification(certification.id)
+        setNewCertification({
+            id: certification.id,
             title: certification.title,
-            issuedBy: certification.issuedBy,
-            startDate: certification.startDate,
-            endDate: certification.endDate || undefined,
-            expiryDate: certification.expiryDate || undefined,
-        }
-
-        await dispatch(updateCertification(payload))
+            fields: { ...certification.fields },
+        })
     }
 
-    const handleRemoveCertification = async (id) => {
-        const payload = { certificationId: id }
-        const resultAction = await dispatch(deleteCertification(payload))
-        if (deleteCertification.fulfilled.match(resultAction)) {
-            setCertifications((prev) => prev.filter((cert) => cert.id !== id))
+    const cancelEditCertification = () => {
+        setEditingCertification(null)
+        setNewCertification({
+            title: '',
+            fields: {
+                issuedBy: '',
+                startDate: '',
+                endDate: '',
+                expiryDate: '',
+            },
+        })
+    }
+
+    const handleUpdateCertification = async () => {
+        if (validateFields(newCertification)) {
+            try {
+                const payload = {
+                    ...prepareCertificationPayload(newCertification),
+                    certificationId: newCertification.id,
+                }
+
+                const result = await dispatch(updateCertification(payload)).unwrap()
+
+                if (result.success) {
+                    await fetchCertifications()
+                    setEditingCertification(null)
+                    setNewCertification({
+                        title: '',
+                        fields: {
+                            issuedBy: '',
+                            startDate: '',
+                            endDate: '',
+                            expiryDate: '',
+                        },
+                    })
+                }
+            } catch (err) {
+                setError(err.message || 'Failed to update certification')
+            }
         }
     }
 
-    const handleSaveAll = async () => {
-        for (const certification of certifications) {
-            await handleUpdateCertification(certification.id)
+    const handleRemoveCertification = async () => {
+        if (certificationToDelete) {
+            try {
+                await dispatch(deleteCertification({ certificationId: certificationToDelete })).unwrap()
+                await fetchCertifications()
+                setConfirmDialogOpen(false)
+                setCertificationToDelete(null)
+            } catch (err) {
+                setError(err.message || 'Failed to delete certification')
+            }
         }
-        toggleEdit()
+    }
+
+    const openDeleteConfirmation = (id) => {
+        setCertificationToDelete(id)
+        setConfirmDialogOpen(true)
+    }
+
+    const renderCertificationForm = (certification, isNew = true) => {
+        return (
+            <div className="space-y-4">
+                <Input
+                    label="Title"
+                    name="title"
+                    value={certification.title}
+                    onChange={(e) => {
+                        if (isNew) {
+                            setNewCertification({ ...certification, title: e.target.value })
+                        } else {
+                            setNewCertification({ ...certification, title: e.target.value })
+                        }
+                    }}
+                    placeholder="Certification Title"
+                />
+
+                <Input
+                    label="Issuing Organization"
+                    name="issuedBy"
+                    value={certification.fields.issuedBy}
+                    onChange={handleFieldChange}
+                    placeholder="Issuing Organization"
+                />
+
+                <Input
+                    label="Start Date"
+                    name="startDate"
+                    type="date"
+                    value={certification.fields.startDate}
+                    onChange={handleFieldChange}
+                    placeholder="Start Date"
+                />
+
+                <Input
+                    label="End Date"
+                    name="endDate"
+                    type="date"
+                    value={certification.fields.endDate}
+                    onChange={handleFieldChange}
+                    placeholder="End Date"
+                    required={true}
+                />
+
+                <Input
+                    label="Expiry Date"
+                    name="expiryDate"
+                    type="date"
+                    value={certification.fields.expiryDate}
+                    onChange={handleFieldChange}
+                    placeholder="Expiry Date"
+                    required={false}
+                />
+
+                {isNew ? (
+                    <button
+                        onClick={handleAddCertification}
+                        className="flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                        <FaPlus className="w-4 h-4 mr-2" /> Add Certification
+                    </button>
+                ) : (
+                    <div className="flex space-x-2">
+                        <button
+                            onClick={handleUpdateCertification}
+                            className="flex items-center bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                            <FaSave className="w-4 h-4 mr-2" /> Save Changes
+                        </button>
+                        <button
+                            onClick={cancelEditCertification}
+                            className="flex items-center bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">
+                            Cancel
+                        </button>
+                    </div>
+                )}
+            </div>
+        )
+    }
+
+    if (loading && certifications.length === 0) {
+        return <div className="bg-white rounded-xl shadow-lg p-6">Loading certification data...</div>
     }
 
     return (
@@ -126,143 +363,73 @@ const CertificationAndCourses = () => {
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Certifications & Courses</h2>
                 <button
-                    onClick={isEditing ? handleSaveAll : toggleEdit}
-                    className="flex items-center text-blue-600 hover:text-blue-800 transition"
-                    disabled={loading}>
+                    onClick={toggleEdit}
+                    className="flex items-center text-blue-600 hover:text-blue-800 transition">
                     {isEditing ? <FaSave className="w-4 h-4 mr-2" /> : <FaEdit className="w-4 h-4 mr-2" />}
-                    {isEditing ? 'Save' : 'Edit'}
+                    {isEditing ? 'Done' : 'Edit'}
                 </button>
             </div>
 
-            {error && <div className="text-red-500 mb-4">{error}</div>}
-            {loading && <div className="text-blue-500 mb-4">Loading...</div>}
+            {(error || apiError) && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">{error || apiError}</div>}
 
-            <div className="space-y-6">
+            {isEditing && !editingCertification && (
+                <div className="mt-6 border-t pt-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Certification</h3>
+                    {renderCertificationForm(newCertification, true)}
+                </div>
+            )}
+
+            <div className="space-y-6 mt-6">
                 {certifications.map((cert) => (
                     <div
                         key={cert.id}
-                        className="relative pl-6 border-l-2 border-gray-200">
+                        className="relative pl-6 border-l-2 border-gray-200 pb-4">
                         <div className="absolute -left-2 w-3 h-3 bg-blue-600 rounded-full" />
-                        {isEditing ? (
-                            <div className="space-y-2">
-                                <Input
-                                    name="title"
-                                    value={cert.title}
-                                    onChange={(e) => handleChange(e, cert.id)}
-                                    placeholder="Title"
-                                    required
-                                    label="Title"
-                                />
-                                <Input
-                                    name="issuedBy"
-                                    value={cert.issuedBy}
-                                    onChange={(e) => handleChange(e, cert.id)}
-                                    placeholder="Issued By"
-                                    required
-                                    label="Issued By"
-                                />
-                                <Input
-                                    name="startDate"
-                                    type="date"
-                                    value={cert.startDate}
-                                    onChange={(e) => handleChange(e, cert.id)}
-                                    placeholder="Start Date"
-                                    required
-                                    label="Start Date"
-                                />
-                                <Input
-                                    name="endDate"
-                                    type="date"
-                                    value={cert.endDate}
-                                    onChange={(e) => handleChange(e, cert.id)}
-                                    placeholder="End Date"
-                                    required
-                                    label="End Date"
-                                />
-                                <Input
-                                    name="expiryDate"
-                                    type="date"
-                                    value={cert.expiryDate}
-                                    onChange={(e) => handleChange(e, cert.id)}
-                                    placeholder="Expiry Date (Optional)"
-                                    label="Expiry Date"
-                                />
-                                <button
-                                    onClick={() => handleRemoveCertification(cert.id)}
-                                    className="text-red-500 hover:text-red-600"
-                                    disabled={loading}>
-                                    <FaTrash className="w-4 h-4" />
-                                </button>
+
+                        {editingCertification === cert.id ? (
+                            <div className="mt-2">
+                                <h3 className="text-lg font-semibold text-gray-800 mb-2">Edit Certification</h3>
+                                {renderCertificationForm(newCertification, false)}
                             </div>
                         ) : (
                             <>
                                 <h3 className="text-lg font-semibold text-gray-800">{cert.title}</h3>
-                                <p className="text-gray-600">Issued by: {cert.issuedBy}</p>
-                                <p className="text-sm text-gray-500">
-                                    Duration: {cert.startDate} - {cert.endDate}
+                                <p className="text-gray-600">Issued by: {cert.fields.issuedBy}</p>
+                                <p className="text-gray-600">
+                                    Duration: {cert.fields.startDate} to {cert.fields.endDate || 'Present'}
                                 </p>
-                                {cert.expiryDate && <p className="text-sm text-gray-600">Expiry Date: {cert.expiryDate}</p>}
+                                {cert.fields.expiryDate && <p className="text-gray-600">Expiry Date: {cert.fields.expiryDate}</p>}
+
+                                {isEditing && (
+                                    <div className="mt-2 flex space-x-2">
+                                        <button
+                                            onClick={() => startEditCertification(cert)}
+                                            className="text-blue-500 hover:text-blue-600">
+                                            <FaEdit className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                            onClick={() => openDeleteConfirmation(cert.id)}
+                                            className="text-red-500 hover:text-red-600">
+                                            <FaTrash className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
                 ))}
-            </div>
 
-            {isEditing && (
-                <div className="mt-6">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Add New Certification</h3>
-                    <div className="space-y-2">
-                        <Input
-                            name="title"
-                            value={newCertification.title}
-                            onChange={(e) => setNewCertification({ ...newCertification, title: e.target.value })}
-                            placeholder="Title"
-                            required
-                            label="Title"
-                        />
-                        <Input
-                            name="issuedBy"
-                            value={newCertification.issuedBy}
-                            onChange={(e) => setNewCertification({ ...newCertification, issuedBy: e.target.value })}
-                            placeholder="Issued By"
-                            required
-                            label="Issued By"
-                        />
-                        <Input
-                            name="startDate"
-                            type="date"
-                            value={newCertification.startDate}
-                            onChange={(e) => setNewCertification({ ...newCertification, startDate: e.target.value })}
-                            placeholder="Start Date"
-                            required
-                            label="Start Date"
-                        />
-                        <Input
-                            name="endDate"
-                            type="date"
-                            value={newCertification.endDate}
-                            onChange={(e) => setNewCertification({ ...newCertification, endDate: e.target.value })}
-                            placeholder="End Date"
-                            required
-                            label="End Date"
-                        />
-                        <Input
-                            name="expiryDate"
-                            type="date"
-                            value={newCertification.expiryDate}
-                            onChange={(e) => setNewCertification({ ...newCertification, expiryDate: e.target.value })}
-                            placeholder="Expiry Date (Optional)"
-                            label="Expiry Date"
-                        />
-                        <button
-                            onClick={handleAddCertification}
-                            className="flex items-center text-blue-600 hover:text-blue-800 transition"
-                            disabled={loading}>
-                            <FaPlus className="w-4 h-4 mr-2" /> Add Certification
-                        </button>
+                {certifications.length === 0 && !isEditing && (
+                    <div className="text-center py-6 text-gray-500">
+                        No certification records found. Click Edit to add your certification details.
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+            <ConfirmDialog
+                isOpen={confirmDialogOpen}
+                onClose={() => setConfirmDialogOpen(false)}
+                onConfirm={handleRemoveCertification}
+            />
         </div>
     )
 }

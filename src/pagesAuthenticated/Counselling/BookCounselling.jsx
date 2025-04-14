@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { FaUniversity, FaCalendarAlt, FaClock, FaSearch, FaInfoCircle, FaArrowLeft, FaSpinner, FaExclamationCircle } from 'react-icons/fa'
 import { BookNewCounsellingSession } from '../../store/slices/counsellingSlice'
-import { getAllInstitutions } from '../../store/slices/institutionSlice'
+import { getAllInstitutionsList } from '../../store/slices/institutionSlice'
 import { GetBookedDates } from '../../store/slices/counsellingSlice'
 
 const BookCounselling = () => {
@@ -83,7 +83,7 @@ const BookCounselling = () => {
         setIsLoading(true)
         try {
             const response = await dispatch(
-                getAllInstitutions({
+                getAllInstitutionsList({
                     search: searchTerm,
                     page: pageNum,
                     limit: 10,
